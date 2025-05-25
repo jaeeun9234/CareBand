@@ -1,0 +1,43 @@
+com.example.careband/
+│
+├── MainActivity.kt               ← Navigation + Scaffold 관리
+├── SplashActivity.kt		  ← 앱 시작 시 실행
+│
+├── data/
+│   └── model/
+│       ├── User.kt
+│       └── UserType.kt           ← 사용자 / 보호자 enum 클래스 추가
+│       └── HealthRecord.kt           ← 날짜, 체중, 혈압, 혈당, 노트 포함 모델 클래스 !
+│       └── Note.kt           ← 노트 단일 객체 모델 !
+│   └── repository/
+│       └── UserManager.kt           ← 
+│       └── HealthRepository.kt           ← Firebase 연동 로직(insert, update, get) !
+├── navigation/
+│   └── Route.kt
+│
+├── ui/
+│   ├── screens/
+│   │   ├── LoginScreen.kt
+│   │   ├── RegisterScreen.kt
+│   │   ├── HomeScreen.kt
+│   │   ├── StartScreen.kt		← 로그인/회원가입 선택
+│   │   ├── ProfileMenuScreen.kt ←계정 전환 / 로그아웃 
+│   │   ├── HealthRecordScreen.kt ← 건강 기록 화면 ! 
+│   │   ├── NoteDialogScreen.kt ← 건강 기록 추가 화면 ! 
+│   │
+│   ├── components/ 
+│   │   ├── TopBar.kt            ← 항상 로고 + 로그인 상태에 따른 버튼
+│   │   ├── DrawerContent.kt     ← 사용자 유형 따라 메뉴 분기
+│   │ 
+│   └── theme/
+│       ├── Theme.kt
+│       ├── Color.kt
+│       └── Typography.kt
+│
+├── viewmodel/
+│   ├── LoginViewModel.kt
+│   └── AuthViewModel.kt         ← 로그인 여부, 사용자 유형 등 관리
+│   └── HealthViewModel.kt         ← UI 상태 및 Firestore 호출 관리 ! 
+
+
+
