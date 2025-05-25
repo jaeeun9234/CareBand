@@ -13,32 +13,47 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.careband.R
 import com.example.careband.navigation.Route
 import com.example.careband.viewmodel.AuthViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun HomeScreen(navController: NavController) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val authViewModel: AuthViewModel = viewModel()
 
+    // 로그인 상태 유지 확인 (화면 다시 올 때마다 체크)
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                authViewModel.checkLoginStatus()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     BackHandler(enabled = true) {
-        // ESC 누르면 로그아웃 후 로그인 화면으로 이동
+        // 뒤로가기 시 명시적 로그아웃 처리
         authViewModel.logout()
         navController.navigate(Route.LOGIN) {
             popUpTo(Route.HOME) { inclusive = true }
         }
-        // 또는 앱 종료 원하면 아래 한 줄로 대체
-        // (context as? Activity)?.finish()
     }
 
     val today = remember {

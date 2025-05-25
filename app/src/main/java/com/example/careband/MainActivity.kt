@@ -35,13 +35,22 @@ class MainActivity : ComponentActivity() {
                 val userType by authViewModel.userType.collectAsState()
                 val userName by authViewModel.userName.collectAsState()
 
-                // 로그인 여부에 따라 시작 화면 설정
-                val startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
+                // 현재 라우트 추적
+                val currentBackStack by navController.currentBackStackEntryAsState()
+                val currentRoute = currentBackStack?.destination?.route
+
+                // TopBar 아이콘 표시 여부: 로그인되어 있고, 홈 화면일 때만
+                val showIcons = isLoggedIn && currentRoute == Route.HOME
+
+                var startDestination by remember { mutableStateOf(Route.LOGIN) }
+                LaunchedEffect(isLoggedIn) {
+                    startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
+                }
 
                 ModalNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
-                        if (isLoggedIn && userType != null && userName != null) {
+                        if (showIcons && userType != null && userName != null) {
                             DrawerContent(
                                 userType = userType!!,
                                 userName = userName!!,
@@ -52,7 +61,7 @@ class MainActivity : ComponentActivity() {
                                         "알림 기록" -> navController.navigate(Route.ALERT_LOG)
                                         "사용자 관리" -> navController.navigate(Route.USER_MANAGEMENT)
                                         "계정 전환" -> navController.navigate(Route.PROFILE_MENU)
-                                        "설정" -> { /* 추가 가능 */ }
+                                        "설정" -> {}
                                     }
                                     scope.launch { drawerState.close() }
                                 }
@@ -65,7 +74,7 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         topBar = {
                             CareBandTopBar(
-                                isLoggedIn = isLoggedIn,
+                                isLoggedIn = showIcons,
                                 userType = userType,
                                 onMenuClick = { scope.launch { drawerState.open() } },
                                 onProfileClick = { navController.navigate(Route.PROFILE_MENU) }

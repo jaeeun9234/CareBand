@@ -23,14 +23,7 @@ class SplashActivity : AppCompatActivity() {
 
         splashLogo.postDelayed({
             val user = FirebaseAuth.getInstance().currentUser
-
-            val nextIntent = if (user != null) {
-                // 자동 로그인 된 사용자 → MainActivity (홈 화면)
-                Intent(this, MainActivity::class.java)
-            } else {
-                // 로그인 안 되어 있음 → 로그인 화면
-                Intent(this, LoginEntryActivity::class.java) // 아직 없다면 LoginActivity로 해도 OK
-            }
+            val nextIntent = Intent(this, MainActivity::class.java)
 
             startActivity(nextIntent)
             finish()
