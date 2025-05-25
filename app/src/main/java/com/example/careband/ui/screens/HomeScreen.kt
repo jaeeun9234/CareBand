@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.careband.R
+import com.example.careband.navigation.Route
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,10 +27,9 @@ fun HomeScreen(navController: NavController) {
         SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Date())
     }
 
-    // 샘플 데이터 - 실제 앱에서는 ViewModel이나 DB에서 받아와야 함
-    val heartRate: String? = null // ex: "89 BPM"
-    val bloodPressure: String? = null // ex: "120/80 mmHg"
-    val medicationList: List<Triple<String, String, Boolean>> = emptyList() // 약이 없으면 빈 리스트
+    val heartRate: String? = null
+    val bloodPressure: String? = null
+    val medicationList: List<Triple<String, String, Boolean>> = emptyList()
 
     Column(
         modifier = Modifier
@@ -37,7 +37,6 @@ fun HomeScreen(navController: NavController) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 상단 날짜
         Text(
             text = today,
             fontSize = 20.sp,
@@ -50,7 +49,6 @@ fun HomeScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // BPM & 혈압 (값이 있을 때만 표시)
         if (heartRate != null || bloodPressure != null) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -75,7 +73,6 @@ fun HomeScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 약 리스트
         if (medicationList.isNotEmpty()) {
             medicationList.forEach { (name, time, checked) ->
                 MedicationItem(name, time, checked)
@@ -86,20 +83,19 @@ fun HomeScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 하단 버튼은 항상 표시
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            HomeButton("의료 리포트", onClick = { navController.navigate("report") }, modifier = Modifier.weight(1f))
-            HomeButton("알림 기록", onClick = { navController.navigate("alerts") }, modifier = Modifier.weight(1f))
+            HomeButton("의료 리포트", onClick = { navController.navigate(Route.MEDICAL_REPORT) }, modifier = Modifier.weight(1f))
+            HomeButton("알림 기록", onClick = { navController.navigate(Route.ALERT_LOG) }, modifier = Modifier.weight(1f))
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            HomeButton("건강 기록", onClick = { navController.navigate("health") }, modifier = Modifier.weight(1f))
-            HomeButton("질병 기록", onClick = { navController.navigate("disease") }, modifier = Modifier.weight(1f))
+            HomeButton("건강 기록", onClick = { navController.navigate(Route.HEALTH_RECORD) }, modifier = Modifier.weight(1f))
+            HomeButton("질병 기록", onClick = { navController.navigate("disease_record") }, modifier = Modifier.weight(1f))
         }
     }
 }

@@ -4,13 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.padding
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
+import com.example.careband.navigation.Route
 import com.example.careband.ui.components.CareBandTopBar
 import com.example.careband.ui.components.DrawerContent
 import com.example.careband.ui.screens.*
@@ -42,11 +42,11 @@ class MainActivity : ComponentActivity() {
                                 userName = userName!!,
                                 onMenuClick = { menuItem ->
                                     when (menuItem) {
-                                        "건강 기록" -> navController.navigate("health_record")
-                                        "의료 리포트" -> navController.navigate("medical_report")
-                                        "알림 기록" -> navController.navigate("alert_log")
-                                        "사용자 관리" -> navController.navigate("user_management")
-                                        "계정 전환" -> navController.navigate("profile_menu")
+                                        "건강 기록" -> navController.navigate(Route.HEALTH_RECORD)
+                                        "의료 리포트" -> navController.navigate(Route.MEDICAL_REPORT)
+                                        "알림 기록" -> navController.navigate(Route.ALERT_LOG)
+                                        "사용자 관리" -> navController.navigate(Route.USER_MANAGEMENT)
+                                        "계정 전환" -> navController.navigate(Route.PROFILE_MENU)
                                         "설정" -> {} // 필요 시 추가
                                     }
                                     scope.launch { drawerState.close() }
@@ -61,37 +61,48 @@ class MainActivity : ComponentActivity() {
                                 isLoggedIn = isLoggedIn,
                                 userType = userType,
                                 onMenuClick = { scope.launch { drawerState.open() } },
-                                onProfileClick = { navController.navigate("profile_menu") }
+                                onProfileClick = { navController.navigate(Route.PROFILE_MENU) }
                             )
                         }
                     ) { paddingValues ->
                         NavHost(
                             navController = navController,
-                            startDestination = "start",
+                            startDestination = Route.START,
                             modifier = Modifier.padding(paddingValues)
                         ) {
-                            composable("start") {
+                            composable(Route.START) {
                                 StartScreen(
-                                    onNavigateToLogin = { navController.navigate("login") },
-                                    onNavigateToRegister = { navController.navigate("register") }
+                                    onNavigateToLogin = { navController.navigate(Route.LOGIN) },
+                                    onNavigateToRegister = { navController.navigate(Route.REGISTER) }
                                 )
                             }
-                            composable("login") {
+                            composable(Route.LOGIN) {
                                 LoginScreen(
-                                    onLoginSuccess = { navController.navigate("home") },
-                                    onRegisterClick = { navController.navigate("register") }
+                                    onLoginSuccess = { navController.navigate(Route.HOME) },
+                                    onRegisterClick = { navController.navigate(Route.REGISTER) }
                                 )
                             }
-                            composable("register") {
+                            composable(Route.REGISTER) {
                                 RegisterScreen(
-                                    onRegisterSuccess = { navController.navigate("home") },
-                                    onLoginClick = { navController.navigate("login") }
+                                    onRegisterSuccess = { navController.navigate(Route.HOME) },
+                                    onLoginClick = { navController.navigate(Route.LOGIN) }
                                 )
                             }
-                            composable("home") { HomeScreen(navController) }
-                            composable("profile_menu") { ProfileMenuScreen(navController) }
-                            composable("health_record") { HealthRecordScreen(navController) }
-                            // 필요 시 다른 화면 추가
+                            composable(Route.HOME) { HomeScreen(navController) }
+                            composable(Route.PROFILE_MENU) { ProfileMenuScreen(navController) }
+                            composable(Route.HEALTH_RECORD) { HealthRecordScreen(navController) }
+
+                            composable(Route.MEDICAL_REPORT) {
+                                Text("의료 리포트 화면")
+                            }
+
+                            composable(Route.ALERT_LOG) {
+                                Text("알림 기록 화면")
+                            }
+
+                            composable(Route.USER_MANAGEMENT) {
+                                Text("사용자 관리 화면")
+                            }
                         }
                     }
                 }
