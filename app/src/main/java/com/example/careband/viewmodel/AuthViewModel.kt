@@ -39,21 +39,70 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+//    fun loadUserData(uid: String) {
+//        viewModelScope.launch {
+//            db.collection("users").document(uid).get()
+//                .addOnSuccessListener { document ->
+//                    if (document != null && document.exists()) {
+//                        _userName.value = document.getString("name")
+//                        _userType.value = when (document.getString("userType")) {
+//                            "USER" -> UserType.USER
+//                            "CAREGIVER" -> UserType.CAREGIVER
+//                            else -> null
+//                        }
+//                    }
+//                }
+//        }
+//    }
+
     fun loadUserData(uid: String) {
-        viewModelScope.launch {
-            db.collection("users").document(uid).get()
-                .addOnSuccessListener { document ->
-                    if (document != null && document.exists()) {
-                        _userName.value = document.getString("name")
-                        _userType.value = when (document.getString("userType")) {
-                            "USER" -> UserType.USER
-                            "CAREGIVER" -> UserType.CAREGIVER
-                            else -> null
-                        }
+        println("📥 [loadUserData] Loading for uid = $uid")
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val name = document.getString("name")
+                    val typeStr = document.getString("userType")
+                    val type = when (typeStr) {
+                        "USER" -> UserType.USER
+                        "CAREGIVER" -> UserType.CAREGIVER
+                        else -> null
                     }
+                    println("✅ [loadUserData] name = $name, type = $typeStr → parsed: $type")
+                    _userName.value = name
+                    _userType.value = type
+                } else {
+                    println("🚫 [loadUserData] 문서가 없거나 null")
                 }
-        }
+            }
+            .addOnFailureListener {
+                println("❌ [loadUserData] 오류: ${it.message}")
+            }
     }
+
+    fun registerUser(email: String, password: String, name: String, userType: UserType, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener { result ->
+                val uid = result.user?.uid ?: return@addOnSuccessListener
+
+                val user = hashMapOf(
+                    "name" to name,
+                    "userType" to userType.name  // "USER" or "CAREGIVER"
+                )
+
+                db.collection("users").document(uid).set(user)
+                    .addOnSuccessListener {
+                        onSuccess()
+                    }
+                    .addOnFailureListener {
+                        onError("Firestore 저장 실패: ${it.message}")
+                    }
+            }
+            .addOnFailureListener {
+                onError("회원가입 실패: ${it.message}")
+            }
+    }
+
+
 
     fun logout() {
         auth.signOut()

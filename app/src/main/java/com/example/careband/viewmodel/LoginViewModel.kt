@@ -7,6 +7,10 @@ import com.google.firebase.auth.FirebaseAuth
 class LoginViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
+    fun currentUserUid(): String? {
+        return com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+    }
+
     fun login(
         email: String,
         password: String,

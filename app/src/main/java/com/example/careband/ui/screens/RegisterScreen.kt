@@ -10,6 +10,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.careband.data.model.UserType
 import com.example.careband.viewmodel.LoginViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -98,11 +99,14 @@ fun RegisterScreen(
                     email = fakeEmail,
                     password = cleanedPassword,
                     onSuccess = {
+                        val uid = viewModel.currentUserUid() ?: return@register
+
                         val userMap = mutableMapOf<String, Any>(
                             "id" to id,
                             "name" to name,
                             "userType" to if (isUser) "USER" else "CAREGIVER"
                         )
+
                         if (isUser) {
                             userMap["birth"] = birth
                             userMap["gender"] = gender
@@ -113,7 +117,7 @@ fun RegisterScreen(
                             userMap["relationship"] = relationship
                         }
 
-                        db.collection("users").document(id)
+                        db.collection("users").document(uid)
                             .set(userMap)
                             .addOnSuccessListener {
                                 onRegisterSuccess()

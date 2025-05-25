@@ -4,10 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.careband.navigation.Route
@@ -33,6 +35,9 @@ class MainActivity : ComponentActivity() {
                 val userType by authViewModel.userType.collectAsState()
                 val userName by authViewModel.userName.collectAsState()
 
+                // 로그인 여부에 따라 시작 화면 설정
+                val startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
+
                 ModalNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
@@ -47,11 +52,13 @@ class MainActivity : ComponentActivity() {
                                         "알림 기록" -> navController.navigate(Route.ALERT_LOG)
                                         "사용자 관리" -> navController.navigate(Route.USER_MANAGEMENT)
                                         "계정 전환" -> navController.navigate(Route.PROFILE_MENU)
-                                        "설정" -> {} // 필요 시 추가
+                                        "설정" -> { /* 추가 가능 */ }
                                     }
                                     scope.launch { drawerState.close() }
                                 }
                             )
+                        } else {
+                            Spacer(modifier = Modifier.padding(0.dp))
                         }
                     }
                 ) {
@@ -67,15 +74,9 @@ class MainActivity : ComponentActivity() {
                     ) { paddingValues ->
                         NavHost(
                             navController = navController,
-                            startDestination = Route.START,
+                            startDestination = startDestination,
                             modifier = Modifier.padding(paddingValues)
                         ) {
-                            composable(Route.START) {
-                                StartScreen(
-                                    onNavigateToLogin = { navController.navigate(Route.LOGIN) },
-                                    onNavigateToRegister = { navController.navigate(Route.REGISTER) }
-                                )
-                            }
                             composable(Route.LOGIN) {
                                 LoginScreen(
                                     onLoginSuccess = { navController.navigate(Route.HOME) },
@@ -88,18 +89,21 @@ class MainActivity : ComponentActivity() {
                                     onLoginClick = { navController.navigate(Route.LOGIN) }
                                 )
                             }
-                            composable(Route.HOME) { HomeScreen(navController) }
-                            composable(Route.PROFILE_MENU) { ProfileMenuScreen(navController) }
-                            composable(Route.HEALTH_RECORD) { HealthRecordScreen(navController) }
-
+                            composable(Route.HOME) {
+                                HomeScreen(navController)
+                            }
+                            composable(Route.PROFILE_MENU) {
+                                ProfileMenuScreen(navController)
+                            }
+                            composable(Route.HEALTH_RECORD) {
+                                HealthRecordScreen(navController)
+                            }
                             composable(Route.MEDICAL_REPORT) {
                                 Text("의료 리포트 화면")
                             }
-
                             composable(Route.ALERT_LOG) {
                                 Text("알림 기록 화면")
                             }
-
                             composable(Route.USER_MANAGEMENT) {
                                 Text("사용자 관리 화면")
                             }
