@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "187491786458",
+    "project_id": "careband-3a549",
+    "storage_bucket": "careband-3a549.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187491786458:android:98b22a2c46b4e15de74fe3",
+        "android_client_info": {
+          "package_name": "com.example.careband"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8DwnWnOLcLp0udhGQxPRVAcOzEAa4FlQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
