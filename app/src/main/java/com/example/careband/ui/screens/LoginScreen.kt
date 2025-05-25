@@ -14,7 +14,7 @@ import com.example.careband.viewmodel.LoginViewModel
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onRegisterClick: () -> Unit
 ) {
     val viewModel: LoginViewModel = viewModel()
     var id by remember { mutableStateOf("") }
@@ -62,7 +62,7 @@ fun LoginScreen(
             Text("로그인")
         }
 
-        TextButton(onClick = onNavigateToRegister) {
+        TextButton(onClick = onRegisterClick) {
             Text("회원가입")
         }
     }

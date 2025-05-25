@@ -20,11 +20,14 @@ val DarkColorScheme = darkColorScheme(
 
 
 val LightColorScheme = lightColorScheme(
-    primary = CareBandPink,
-    onPrimary = Color.White,
+    primary = CareBandPink,         // 상단바, 버튼 배경
+    onPrimary = Color.Black,        // 상단바, 버튼 위 텍스트
     secondary = CareBandPink,
-    onSecondary = Color.White
-    // 필요 시 추가 색상 설정
+    onSecondary = Color.White,
+    background = Color.White,       // 앱 배경
+    surface = Color.White,          // 카드 등 기본 바탕
+    onBackground = Color.Black,     // 배경 위 텍스트
+    onSurface = Color.Black         // 카드, Surface 위 텍스트
 )
 
 

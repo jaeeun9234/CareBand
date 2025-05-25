@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.navigation.NavHostController
 import com.example.careband.viewmodel.HealthViewModel
 import com.example.careband.data.model.Note
 import java.time.LocalDate
@@ -22,9 +23,12 @@ import java.util.*
 
 @Composable
 fun HealthRecordScreen(
-    userId: String,
+    navController: NavHostController,
     viewModel: HealthViewModel = viewModel()
 ) {
+    // 🔧 추후 Firebase Auth 또는 UserManager 통해 userId 받아오도록 수정 가능
+    val userId = "test_user"
+
     val today = rememberSaveable { mutableStateOf(LocalDate.now()) }
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val dateStr = today.value.format(formatter)
@@ -48,9 +52,9 @@ fun HealthRecordScreen(
                     today.value = newDate
                     viewModel.loadHealthRecord(userId, newDate.format(formatter))
                 },
-                today.value.getYear(),
-                today.value.getMonthValue() - 1,
-                today.value.getDayOfMonth()
+                today.value.year,
+                today.value.monthValue - 1,
+                today.value.dayOfMonth
             ).show()
         }) {
             Text("날짜: $dateStr")
@@ -112,7 +116,11 @@ fun HealthRecordScreen(
         }
 
         record.notes.forEach { note ->
-            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
                 Column(modifier = Modifier.padding(8.dp)) {
                     Text(note.title, style = MaterialTheme.typography.titleMedium)
                     Text(note.description, style = MaterialTheme.typography.bodySmall)

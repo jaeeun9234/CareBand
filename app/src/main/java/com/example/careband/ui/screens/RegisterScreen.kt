@@ -1,4 +1,3 @@
-// RegisterScreen.kt
 package com.example.careband.ui.screens
 
 import androidx.compose.foundation.layout.*
@@ -16,7 +15,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun RegisterScreen(
-    onRegisterSuccess: () -> Unit
+    onRegisterSuccess: () -> Unit,
+    onLoginClick: () -> Unit
 ) {
     val viewModel: LoginViewModel = viewModel()
     val db = FirebaseFirestore.getInstance()
@@ -92,7 +92,7 @@ fun RegisterScreen(
             } else {
                 val cleanedId = id.trim()
                 val cleanedPassword = password.trim()
-                val fakeEmail = "$cleanedId@careband.com" // Firebase 인증용 이메일 변환
+                val fakeEmail = "$cleanedId@careband.com"
 
                 viewModel.register(
                     email = fakeEmail,
@@ -101,7 +101,7 @@ fun RegisterScreen(
                         val userMap = mutableMapOf<String, Any>(
                             "id" to id,
                             "name" to name,
-                            "type" to if (isUser) "user" else "caregiver"
+                            "userType" to if (isUser) "USER" else "CAREGIVER"
                         )
                         if (isUser) {
                             userMap["birth"] = birth
@@ -129,6 +129,12 @@ fun RegisterScreen(
             }
         }) {
             Text("회원가입")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextButton(onClick = onLoginClick) {
+            Text("로그인으로 돌아가기")
         }
     }
 }

@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun StartScreen(
-    onLoginClick: () -> Unit,
-    onRegisterClick: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    onNavigateToRegister: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -24,7 +24,7 @@ fun StartScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = onLoginClick,
+            onClick = onNavigateToLogin,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("로그인")
@@ -33,7 +33,7 @@ fun StartScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = onRegisterClick,
+            onClick = onNavigateToRegister,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("회원가입")
