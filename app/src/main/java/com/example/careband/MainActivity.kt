@@ -113,7 +113,10 @@ class MainActivity : ComponentActivity() {
                                 Text("사용자 관리 화면")
                             }
                             composable(Route.NAV_MENU) {
-                                NavigationMenuScreen(navController)
+                                NavigationMenuScreen(
+                                    navController = navController,
+                                    userName = userName,
+                                    userType = userType)
                             }
                         }
                     }
