@@ -43,6 +43,9 @@ class MainActivity : ComponentActivity() {
                 var startDestination by remember { mutableStateOf(Route.LOGIN) }
                 LaunchedEffect(isLoggedIn) {
                     startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
+                    scope.launch {
+                        drawerState.close()
+                    }
                 }
 
                 LaunchedEffect(drawerState.isOpen) {
@@ -85,7 +88,13 @@ class MainActivity : ComponentActivity() {
                             CareBandTopBar(
                                 isLoggedIn = showIcons,
                                 userType = userType,
-                                onMenuClick = { scope.launch { drawerState.open() } },
+                                drawerState = drawerState,
+                                scope = scope,
+                                onMenuClick = {
+                                    scope.launch {
+                                        drawerState.open()
+                                    }
+                                },
                                 onProfileClick = {
                                     val current = navController.currentDestination?.route
                                     if (current == Route.PROFILE_MENU) {
@@ -110,18 +119,24 @@ class MainActivity : ComponentActivity() {
                                             popUpTo(Route.LOGIN) { inclusive = true }
                                         }
                                     },
-                                    onRegisterClick = { navController.navigate(Route.REGISTER) }
+                                    onRegisterClick = {
+                                        navController.navigate(Route.REGISTER)
+                                    },
+                                    drawerState = drawerState,
+                                    scope = scope,
+                                    authViewModel = authViewModel
                                 )
                             }
                             composable(Route.REGISTER) {
                                 RegisterScreen(
                                     onRegisterSuccess = {
-                                        authViewModel.checkLoginStatus()
                                         navController.navigate(Route.HOME) {
                                             popUpTo(Route.REGISTER) { inclusive = true }
                                         }
                                     },
-                                    onLoginClick = { navController.navigate(Route.LOGIN) }
+                                    onLoginClick = {
+                                        navController.navigate(Route.LOGIN)
+                                    }
                                 )
                             }
                             composable(Route.HOME) {

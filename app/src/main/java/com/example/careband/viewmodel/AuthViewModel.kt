@@ -25,6 +25,7 @@ class AuthViewModel : ViewModel() {
         checkLoginStatus()
     }
 
+    // 기존 기본 함수
     fun checkLoginStatus() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
@@ -35,6 +36,12 @@ class AuthViewModel : ViewModel() {
             _userType.value = null
             _userName.value = null
         }
+    }
+
+    // 오버로드: 로그인 직후 UID를 바로 활용할 수 있도록
+    fun checkLoginStatus(uid: String) {
+        _isLoggedIn.value = true
+        loadUserData(uid)
     }
 
     fun loadUserData(uid: String) {
@@ -75,7 +82,7 @@ class AuthViewModel : ViewModel() {
 
                 val user = hashMapOf(
                     "name" to name,
-                    "userType" to userType.name // "USER" or "CAREGIVER"
+                    "userType" to userType.name
                 )
 
                 db.collection("users").document(uid).set(user)

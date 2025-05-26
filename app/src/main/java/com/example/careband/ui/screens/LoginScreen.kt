@@ -10,12 +10,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.careband.navigation.Route
+import com.example.careband.viewmodel.AuthViewModel
 import com.example.careband.viewmodel.LoginViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    drawerState: DrawerState,
+    scope: CoroutineScope,
+    authViewModel: AuthViewModel
 ) {
     val viewModel: LoginViewModel = viewModel()
     var id by remember { mutableStateOf("") }
@@ -51,8 +57,10 @@ fun LoginScreen(
             viewModel.login(
                 email = fakeEmail,
                 password = cleanedPassword,
-                onSuccess = {
+                onSuccess = { uid ->
                     error = ""
+                    scope.launch { drawerState.close() }  // ✅ Drawer 강제 닫기
+                    authViewModel.checkLoginStatus(uid)
                     onLoginSuccess()
                 },
                 onFailure = {
@@ -68,3 +76,4 @@ fun LoginScreen(
         }
     }
 }
+

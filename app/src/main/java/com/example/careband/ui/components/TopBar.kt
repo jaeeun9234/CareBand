@@ -15,12 +15,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.careband.R
 import com.example.careband.data.model.UserType
+import androidx.compose.material3.DrawerState
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CareBandTopBar(
     isLoggedIn: Boolean,
     userType: UserType?,
+    drawerState: DrawerState,
+    scope: CoroutineScope,
     onMenuClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
@@ -40,7 +45,10 @@ fun CareBandTopBar(
         },
         navigationIcon = {
             if (isLoggedIn) {
-                IconButton(onClick = onMenuClick) {
+                IconButton(onClick = {
+                    scope.launch { drawerState.open() }
+                    onMenuClick()
+                }) {
                     Icon(
                         imageVector = Icons.Default.Menu,
                         contentDescription = "Menu Icon",
