@@ -24,6 +24,7 @@ com.example.careband/
 │   │   ├── ProfileMenuScreen.kt ←계정 전환 / 로그아웃 
 │   │   ├── HealthRecordScreen.kt ← 건강 기록 화면 ! 
 │   │   ├── NoteDialogScreen.kt ← 건강 기록 추가 화면 ! 
+│   │   ├── NavigationMenuScreen.kt ← 
 │   │
 │   ├── components/ 
 │   │   ├── TopBar.kt            ← 항상 로고 + 로그인 상태에 따른 버튼
