@@ -4,7 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,7 +18,6 @@ import com.example.careband.ui.components.DrawerContent
 import com.example.careband.ui.screens.*
 import com.example.careband.ui.theme.CareBandTheme
 import com.example.careband.viewmodel.AuthViewModel
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -38,27 +38,16 @@ class MainActivity : ComponentActivity() {
                 val currentBackStack by navController.currentBackStackEntryAsState()
                 val currentRoute = currentBackStack?.destination?.route
 
-                // 아이콘 표시 조건
-                val showIcons = isLoggedIn && currentRoute == Route.HOME
+                val showIcons = isLoggedIn && currentRoute != Route.LOGIN && currentRoute != Route.REGISTER
 
-                // 시작 화면 설정 및 홈으로 강제 이동
                 var startDestination by remember { mutableStateOf(Route.LOGIN) }
                 LaunchedEffect(isLoggedIn) {
                     startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
-                    if (isLoggedIn) {
-                        navController.navigate(Route.HOME) {
-                            popUpTo(0)
-                        }
-                    }
                 }
 
-                // Drawer 열릴 때마다 사용자 정보 갱신
                 LaunchedEffect(drawerState.isOpen) {
                     if (drawerState.isOpen) {
-                        val uid = FirebaseAuth.getInstance().currentUser?.uid
-                        if (uid != null) {
-                            authViewModel.loadUserData(uid)
-                        }
+                        authViewModel.checkLoginStatus()
                     }
                 }
 
@@ -67,8 +56,8 @@ class MainActivity : ComponentActivity() {
                     drawerContent = {
                         if (showIcons && userType != null && userName != null) {
                             Surface(
-                                modifier = Modifier.fillMaxSize(),
-                                color = Color.White // ← Drawer 배경 흰색
+                                modifier = Modifier.padding(0.dp),
+                                color = Color.White
                             ) {
                                 DrawerContent(
                                     userType = userType!!,
@@ -94,13 +83,13 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         topBar = {
                             CareBandTopBar(
-                                isLoggedIn = isLoggedIn,
+                                isLoggedIn = showIcons,
                                 userType = userType,
                                 onMenuClick = { scope.launch { drawerState.open() } },
                                 onProfileClick = {
                                     val current = navController.currentDestination?.route
                                     if (current == Route.PROFILE_MENU) {
-                                        navController.popBackStack() // ← 현재가 PROFILE이면 되돌아감
+                                        navController.popBackStack()
                                     } else {
                                         navController.navigate(Route.PROFILE_MENU)
                                     }
@@ -115,13 +104,23 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable(Route.LOGIN) {
                                 LoginScreen(
-                                    onLoginSuccess = { navController.navigate(Route.HOME) },
+                                    onLoginSuccess = {
+                                        authViewModel.checkLoginStatus()
+                                        navController.navigate(Route.HOME) {
+                                            popUpTo(Route.LOGIN) { inclusive = true }
+                                        }
+                                    },
                                     onRegisterClick = { navController.navigate(Route.REGISTER) }
                                 )
                             }
                             composable(Route.REGISTER) {
                                 RegisterScreen(
-                                    onRegisterSuccess = { navController.navigate(Route.HOME) },
+                                    onRegisterSuccess = {
+                                        authViewModel.checkLoginStatus()
+                                        navController.navigate(Route.HOME) {
+                                            popUpTo(Route.REGISTER) { inclusive = true }
+                                        }
+                                    },
                                     onLoginClick = { navController.navigate(Route.LOGIN) }
                                 )
                             }
