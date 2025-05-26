@@ -3,10 +3,11 @@ package com.example.careband.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.careband.data.model.UserType
 
@@ -16,40 +17,45 @@ fun DrawerContent(
     userName: String,
     onMenuClick: (String) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color.White
     ) {
-        // 사용자 이름 및 역할 표시
-        Text(
-            text = "$userName 님 [${userType.label}]",
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // 사용자 유형에 따른 메뉴 항목 정의
-        val menuItems = when (userType) {
-            UserType.USER -> listOf(
-                "건강 기록", "접종 기록", "복약", "의료 리포트",
-                "데이터 시각화", "질병 기록", "알림 기록", "기기 연결", "설정"
-            )
-            UserType.CAREGIVER -> listOf(
-                "의료 리포트", "알림 기록", "사용자 관리", "설정"
-            )
-        }
-
-        // 메뉴 항목 출력
-        menuItems.forEach { menu ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+        ) {
+            // 사용자 이름 및 역할 표시
             Text(
-                text = "$menu →",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp)
-                    .clickable { onMenuClick(menu) },
-                style = MaterialTheme.typography.bodyLarge
+                text = "$userName 님 [${userType.label}]",
+                style = MaterialTheme.typography.titleLarge
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 사용자 유형에 따른 메뉴 항목 정의
+            val menuItems = when (userType) {
+                UserType.USER -> listOf(
+                    "건강 기록", "접종 기록", "복약", "의료 리포트",
+                    "데이터 시각화", "질병 기록", "알림 기록", "기기 연결", "설정"
+                )
+                UserType.CAREGIVER -> listOf(
+                    "의료 리포트", "알림 기록", "사용자 관리", "설정"
+                )
+            }
+
+            // 메뉴 항목 출력
+            menuItems.forEach { menu ->
+                Text(
+                    text = "$menu →",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp)
+                        .clickable { onMenuClick(menu) },
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
         }
     }
 }

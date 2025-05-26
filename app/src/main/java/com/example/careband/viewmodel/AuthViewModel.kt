@@ -1,13 +1,11 @@
 package com.example.careband.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.careband.data.model.UserType
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
 
@@ -39,22 +37,6 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-//    fun loadUserData(uid: String) {
-//        viewModelScope.launch {
-//            db.collection("users").document(uid).get()
-//                .addOnSuccessListener { document ->
-//                    if (document != null && document.exists()) {
-//                        _userName.value = document.getString("name")
-//                        _userType.value = when (document.getString("userType")) {
-//                            "USER" -> UserType.USER
-//                            "CAREGIVER" -> UserType.CAREGIVER
-//                            else -> null
-//                        }
-//                    }
-//                }
-//        }
-//    }
-
     fun loadUserData(uid: String) {
         println("📥 [loadUserData] Loading for uid = $uid")
         db.collection("users").document(uid).get()
@@ -79,14 +61,21 @@ class AuthViewModel : ViewModel() {
             }
     }
 
-    fun registerUser(email: String, password: String, name: String, userType: UserType, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun registerUser(
+        email: String,
+        password: String,
+        name: String,
+        userType: UserType,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener { result ->
                 val uid = result.user?.uid ?: return@addOnSuccessListener
 
                 val user = hashMapOf(
                     "name" to name,
-                    "userType" to userType.name  // "USER" or "CAREGIVER"
+                    "userType" to userType.name // "USER" or "CAREGIVER"
                 )
 
                 db.collection("users").document(uid).set(user)
@@ -101,8 +90,6 @@ class AuthViewModel : ViewModel() {
                 onError("회원가입 실패: ${it.message}")
             }
     }
-
-
 
     fun logout() {
         auth.signOut()

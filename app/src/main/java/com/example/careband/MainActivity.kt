@@ -4,13 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.careband.navigation.Route
 import com.example.careband.ui.components.CareBandTopBar
@@ -18,6 +17,7 @@ import com.example.careband.ui.components.DrawerContent
 import com.example.careband.ui.screens.*
 import com.example.careband.ui.theme.CareBandTheme
 import com.example.careband.viewmodel.AuthViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -35,37 +35,57 @@ class MainActivity : ComponentActivity() {
                 val userType by authViewModel.userType.collectAsState()
                 val userName by authViewModel.userName.collectAsState()
 
-                // 현재 라우트 추적
                 val currentBackStack by navController.currentBackStackEntryAsState()
                 val currentRoute = currentBackStack?.destination?.route
 
-                // TopBar 아이콘 표시 여부: 로그인되어 있고, 홈 화면일 때만
+                // 아이콘 표시 조건
                 val showIcons = isLoggedIn && currentRoute == Route.HOME
 
+                // 시작 화면 설정 및 홈으로 강제 이동
                 var startDestination by remember { mutableStateOf(Route.LOGIN) }
                 LaunchedEffect(isLoggedIn) {
                     startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
+                    if (isLoggedIn) {
+                        navController.navigate(Route.HOME) {
+                            popUpTo(0)
+                        }
+                    }
+                }
+
+                // Drawer 열릴 때마다 사용자 정보 갱신
+                LaunchedEffect(drawerState.isOpen) {
+                    if (drawerState.isOpen) {
+                        val uid = FirebaseAuth.getInstance().currentUser?.uid
+                        if (uid != null) {
+                            authViewModel.loadUserData(uid)
+                        }
+                    }
                 }
 
                 ModalNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
                         if (showIcons && userType != null && userName != null) {
-                            DrawerContent(
-                                userType = userType!!,
-                                userName = userName!!,
-                                onMenuClick = { menuItem ->
-                                    when (menuItem) {
-                                        "건강 기록" -> navController.navigate(Route.HEALTH_RECORD)
-                                        "의료 리포트" -> navController.navigate(Route.MEDICAL_REPORT)
-                                        "알림 기록" -> navController.navigate(Route.ALERT_LOG)
-                                        "사용자 관리" -> navController.navigate(Route.USER_MANAGEMENT)
-                                        "계정 전환" -> navController.navigate(Route.PROFILE_MENU)
-                                        "설정" -> {}
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                color = Color.White // ← Drawer 배경 흰색
+                            ) {
+                                DrawerContent(
+                                    userType = userType!!,
+                                    userName = userName!!,
+                                    onMenuClick = { menuItem ->
+                                        when (menuItem) {
+                                            "건강 기록" -> navController.navigate(Route.HEALTH_RECORD)
+                                            "의료 리포트" -> navController.navigate(Route.MEDICAL_REPORT)
+                                            "알림 기록" -> navController.navigate(Route.ALERT_LOG)
+                                            "사용자 관리" -> navController.navigate(Route.USER_MANAGEMENT)
+                                            "계정 전환" -> navController.navigate(Route.PROFILE_MENU)
+                                            "설정" -> {}
+                                        }
+                                        scope.launch { drawerState.close() }
                                     }
-                                    scope.launch { drawerState.close() }
-                                }
-                            )
+                                )
+                            }
                         } else {
                             Spacer(modifier = Modifier.padding(0.dp))
                         }
@@ -74,10 +94,17 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         topBar = {
                             CareBandTopBar(
-                                isLoggedIn = showIcons,
+                                isLoggedIn = isLoggedIn,
                                 userType = userType,
                                 onMenuClick = { scope.launch { drawerState.open() } },
-                                onProfileClick = { navController.navigate(Route.PROFILE_MENU) }
+                                onProfileClick = {
+                                    val current = navController.currentDestination?.route
+                                    if (current == Route.PROFILE_MENU) {
+                                        navController.popBackStack() // ← 현재가 PROFILE이면 되돌아감
+                                    } else {
+                                        navController.navigate(Route.PROFILE_MENU)
+                                    }
+                                }
                             )
                         }
                     ) { paddingValues ->
