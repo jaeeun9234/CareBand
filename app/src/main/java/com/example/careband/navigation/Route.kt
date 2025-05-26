@@ -9,4 +9,5 @@ object Route {
     const val MEDICAL_REPORT = "medical_report"
     const val ALERT_LOG = "alert_log"
     const val USER_MANAGEMENT = "user_management"
+    const val NAV_MENU = "nav_menu"
 }

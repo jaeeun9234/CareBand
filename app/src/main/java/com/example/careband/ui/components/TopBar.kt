@@ -24,7 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 fun CareBandTopBar(
     isLoggedIn: Boolean,
     userType: UserType?,
-    drawerState: DrawerState,
+    drawerState: DrawerState? = null,
     scope: CoroutineScope,
     onMenuClick: () -> Unit,
     onProfileClick: () -> Unit
@@ -46,7 +46,7 @@ fun CareBandTopBar(
         navigationIcon = {
             if (isLoggedIn) {
                 IconButton(onClick = {
-                    scope.launch { drawerState.open() }
+                    scope.launch { drawerState?.open() }
                     onMenuClick()
                 }) {
                     Icon(

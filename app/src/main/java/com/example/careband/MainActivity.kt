@@ -4,17 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
 import com.example.careband.navigation.Route
 import com.example.careband.ui.components.CareBandTopBar
-import com.example.careband.ui.components.DrawerContent
 import com.example.careband.ui.screens.*
 import com.example.careband.ui.theme.CareBandTheme
 import com.example.careband.viewmodel.AuthViewModel
@@ -28,76 +24,33 @@ class MainActivity : ComponentActivity() {
         setContent {
             CareBandTheme {
                 val navController = rememberNavController()
-                val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
 
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
                 val userType by authViewModel.userType.collectAsState()
                 val userName by authViewModel.userName.collectAsState()
-
                 val currentBackStack by navController.currentBackStackEntryAsState()
                 val currentRoute = currentBackStack?.destination?.route
 
-                val showIcons = isLoggedIn && currentRoute != Route.LOGIN && currentRoute != Route.REGISTER
+                var startDestination by remember { mutableStateOf<String?>(null) }
 
-                var startDestination by remember { mutableStateOf(Route.LOGIN) }
                 LaunchedEffect(isLoggedIn) {
                     startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
-                    scope.launch {
-                        drawerState.close()
-                    }
                 }
 
-                LaunchedEffect(drawerState.isOpen) {
-                    if (drawerState.isOpen) {
-                        authViewModel.checkLoginStatus()
-                    }
-                }
-
-                ModalNavigationDrawer(
-                    drawerState = drawerState,
-                    drawerContent = {
-                        if (showIcons && userType != null && userName != null) {
-                            Surface(
-                                modifier = Modifier.padding(0.dp),
-                                color = Color.White
-                            ) {
-                                DrawerContent(
-                                    userType = userType!!,
-                                    userName = userName!!,
-                                    onMenuClick = { menuItem ->
-                                        when (menuItem) {
-                                            "건강 기록" -> navController.navigate(Route.HEALTH_RECORD)
-                                            "의료 리포트" -> navController.navigate(Route.MEDICAL_REPORT)
-                                            "알림 기록" -> navController.navigate(Route.ALERT_LOG)
-                                            "사용자 관리" -> navController.navigate(Route.USER_MANAGEMENT)
-                                            "계정 전환" -> navController.navigate(Route.PROFILE_MENU)
-                                            "설정" -> {}
-                                        }
-                                        scope.launch { drawerState.close() }
-                                    }
-                                )
-                            }
-                        } else {
-                            Spacer(modifier = Modifier.padding(0.dp))
-                        }
-                    }
-                ) {
+                if (startDestination != null) {
                     Scaffold(
                         topBar = {
                             CareBandTopBar(
-                                isLoggedIn = showIcons,
+                                isLoggedIn = isLoggedIn,
                                 userType = userType,
-                                drawerState = drawerState,
+                                drawerState = null,
                                 scope = scope,
                                 onMenuClick = {
-                                    scope.launch {
-                                        drawerState.open()
-                                    }
+                                    navController.navigate(Route.NAV_MENU)
                                 },
                                 onProfileClick = {
-                                    val current = navController.currentDestination?.route
-                                    if (current == Route.PROFILE_MENU) {
+                                    if (currentRoute == Route.PROFILE_MENU) {
                                         navController.popBackStack()
                                     } else {
                                         navController.navigate(Route.PROFILE_MENU)
@@ -108,13 +61,12 @@ class MainActivity : ComponentActivity() {
                     ) { paddingValues ->
                         NavHost(
                             navController = navController,
-                            startDestination = startDestination,
+                            startDestination = startDestination!!,
                             modifier = Modifier.padding(paddingValues)
                         ) {
                             composable(Route.LOGIN) {
                                 LoginScreen(
                                     onLoginSuccess = {
-                                        authViewModel.checkLoginStatus()
                                         navController.navigate(Route.HOME) {
                                             popUpTo(Route.LOGIN) { inclusive = true }
                                         }
@@ -122,7 +74,7 @@ class MainActivity : ComponentActivity() {
                                     onRegisterClick = {
                                         navController.navigate(Route.REGISTER)
                                     },
-                                    drawerState = drawerState,
+                                    drawerState = null,
                                     scope = scope,
                                     authViewModel = authViewModel
                                 )
@@ -136,7 +88,10 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onLoginClick = {
                                         navController.navigate(Route.LOGIN)
-                                    }
+                                    },
+                                    drawerState = null,
+                                    scope = scope,
+                                    authViewModel = authViewModel
                                 )
                             }
                             composable(Route.HOME) {
@@ -156,6 +111,9 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(Route.USER_MANAGEMENT) {
                                 Text("사용자 관리 화면")
+                            }
+                            composable(Route.NAV_MENU) {
+                                NavigationMenuScreen(navController)
                             }
                         }
                     }

@@ -11,13 +11,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.careband.data.model.UserType
+import com.example.careband.viewmodel.AuthViewModel
 import com.example.careband.viewmodel.LoginViewModel
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
+    drawerState: DrawerState? = null,
+    scope: CoroutineScope,
+    authViewModel: AuthViewModel
 ) {
     val viewModel: LoginViewModel = viewModel()
     val db = FirebaseFirestore.getInstance()

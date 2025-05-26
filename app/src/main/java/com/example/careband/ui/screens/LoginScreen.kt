@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onRegisterClick: () -> Unit,
-    drawerState: DrawerState,
+    drawerState: DrawerState? = null,
     scope: CoroutineScope,
     authViewModel: AuthViewModel
 ) {
@@ -54,12 +54,13 @@ fun LoginScreen(
             val cleanedId = id.trim()
             val fakeEmail = "$cleanedId@careband.com"
             val cleanedPassword = password.trim()
+
             viewModel.login(
                 email = fakeEmail,
                 password = cleanedPassword,
                 onSuccess = { uid ->
                     error = ""
-                    scope.launch { drawerState.close() }  // ✅ Drawer 강제 닫기
+                    scope.launch { drawerState?.close() }  // ✅ Drawer 강제 닫기
                     authViewModel.checkLoginStatus(uid)
                     onLoginSuccess()
                 },
