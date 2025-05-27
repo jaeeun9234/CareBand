@@ -128,7 +128,7 @@ fun HomeScreen(navController: NavController) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             HomeButton("건강 기록", onClick = { navController.navigate(Route.HEALTH_RECORD) }, modifier = Modifier.weight(1f))
-            HomeButton("질병 기록", onClick = { navController.navigate("disease_record") }, modifier = Modifier.weight(1f))
+            HomeButton("의료 이력", onClick = { navController.navigate(Route.MEDICAL_HISTORY) }, modifier = Modifier.weight(1f))
         }
     }
 }

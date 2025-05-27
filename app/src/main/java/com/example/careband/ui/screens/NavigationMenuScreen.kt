@@ -16,13 +16,18 @@ import com.example.careband.data.model.UserType
 fun NavigationMenuScreen(
     navController: NavHostController,
     userName: String?,
-    userType: UserType?) {
+    userType: UserType?,
+    onMenuClick: (String) -> Unit
+) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(text = "${userName ?: "이름 없음"}님 [${userType?.label ?: "?"}]",
             modifier = Modifier.padding(bottom = 16.dp))
 
         TextButton(onClick = { navController.navigate(Route.HEALTH_RECORD) }) {
             Text("건강 기록", color = Color.Black)
+        }
+        TextButton(onClick = { navController.navigate(Route.MEDICAL_HISTORY) }) {
+            Text("의료 이력", color = Color.Black)
         }
         TextButton(onClick = { navController.navigate(Route.MEDICAL_REPORT) }) {
             Text("의료 리포트", color = Color.Black)

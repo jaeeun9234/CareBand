@@ -37,8 +37,8 @@ fun DrawerContent(
             // 사용자 유형에 따른 메뉴 항목 정의
             val menuItems = when (userType) {
                 UserType.USER -> listOf(
-                    "건강 기록", "접종 기록", "복약", "의료 리포트",
-                    "데이터 시각화", "질병 기록", "알림 기록", "기기 연결", "설정"
+                    "건강 기록", "의료 이력", "의료 리포트",
+                    "데이터 시각화", "알림 기록", "기기 연결", "설정"
                 )
                 UserType.CAREGIVER -> listOf(
                     "의료 리포트", "알림 기록", "사용자 관리", "설정"
