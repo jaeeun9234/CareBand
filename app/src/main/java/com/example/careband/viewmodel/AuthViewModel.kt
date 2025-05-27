@@ -21,6 +21,9 @@ class AuthViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
+    private val _userId = MutableStateFlow<String?>(null)
+    val userId: StateFlow<String?> = _userId
+
     init {
         checkLoginStatus()
     }
@@ -30,9 +33,11 @@ class AuthViewModel : ViewModel() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             _isLoggedIn.value = true
+            _userId.value = currentUser.uid
             loadUserData(currentUser.uid)
         } else {
             _isLoggedIn.value = false
+            _userId.value = null
             _userType.value = null
             _userName.value = null
         }

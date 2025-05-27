@@ -7,28 +7,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavHostController
+import com.example.careband.viewmodel.AuthViewModel
 import com.example.careband.viewmodel.HealthViewModel
 import com.example.careband.data.model.Note
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 @Composable
 fun HealthRecordScreen(
     navController: NavHostController,
-    viewModel: HealthViewModel = viewModel()
+    viewModel: HealthViewModel = viewModel(),
+    authViewModel: AuthViewModel = viewModel()
 ) {
-    // 🔧 추후 Firebase Auth 또는 UserManager 통해 userId 받아오도록 수정 가능
-    val userId = "test_user"
-
+    val userId by authViewModel.userId.collectAsState()
     val today = rememberSaveable { mutableStateOf(LocalDate.now()) }
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val dateStr = today.value.format(formatter)
@@ -40,7 +39,9 @@ fun HealthRecordScreen(
     val context = LocalContext.current
 
     LaunchedEffect(userId) {
-        viewModel.loadHealthRecord(userId, dateStr)
+        if (userId != null) {
+            viewModel.loadHealthRecord(userId!!, dateStr)
+        }
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -50,7 +51,9 @@ fun HealthRecordScreen(
                 { _, year, month, day ->
                     val newDate = LocalDate.of(year, month + 1, day)
                     today.value = newDate
-                    viewModel.loadHealthRecord(userId, newDate.format(formatter))
+                    if (userId != null) {
+                        viewModel.loadHealthRecord(userId!!, newDate.format(formatter))
+                    }
                 },
                 today.value.year,
                 today.value.monthValue - 1,
