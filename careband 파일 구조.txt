@@ -43,4 +43,5 @@ com.example.careband/
 │   └── AuthViewModel.kt : 로그인 상태 및 사용자 정보 유지 (앱 전역)
 │   └── HealthViewModel.kt : 건강 기록용 + Firebase 연동
 │   └── MedicalHistoryViewModel.kt : 의료 이력 통합 관리 + Firebase 연동
+│   └── MedicalHistoryViewModelFactory.kt : userId를 전달받아 MedicalHistoryViewModel(userId)를 생성해 넘겨주는 클래스
 
