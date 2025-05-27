@@ -8,12 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class MedicalHistoryViewModel : ViewModel() {
+class MedicalHistoryViewModel(private val userId: String) : ViewModel() {
 
     private val repository = MedicalHistoryRepository()
-
-    // 하드코딩된 userId (테스트용)
-    private val userId = "test_user"
 
     // ---------------- State ----------------
     private val _vaccinationRecords = MutableStateFlow<List<VaccinationRecord>>(emptyList())
@@ -52,6 +49,28 @@ class MedicalHistoryViewModel : ViewModel() {
     fun addDiseaseRecord(record: DiseaseRecord) {
         viewModelScope.launch {
             repository.addDiseaseRecord(userId, record)
+            loadAllRecords()
+        }
+    }
+
+    // ---------------- Update ----------------
+    fun updateVaccinationRecord(record: VaccinationRecord) {
+        viewModelScope.launch {
+            repository.updateVaccinationRecord(userId, record)
+            loadAllRecords()
+        }
+    }
+
+    fun updateMedicationRecord(record: MedicationRecord) {
+        viewModelScope.launch {
+            repository.updateMedicationRecord(userId, record)
+            loadAllRecords()
+        }
+    }
+
+    fun updateDiseaseRecord(record: DiseaseRecord) {
+        viewModelScope.launch {
+            repository.updateDiseaseRecord(userId, record)
             loadAllRecords()
         }
     }

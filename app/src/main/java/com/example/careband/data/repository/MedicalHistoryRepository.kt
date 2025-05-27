@@ -24,6 +24,12 @@ class MedicalHistoryRepository {
         return snapshot.documents.mapNotNull { it.toObject<VaccinationRecord>() }
     }
 
+    suspend fun updateVaccinationRecord(userId: String, record: VaccinationRecord) {
+        val docRef = db.collection("users").document(userId)
+            .collection("vaccination_records").document(record.id)
+        docRef.set(record).await()
+    }
+
     // ---------------- 복약 기록 ----------------
     suspend fun addMedicationRecord(userId: String, record: MedicationRecord) {
         val docRef = db.collection("users").document(userId)
@@ -39,6 +45,12 @@ class MedicalHistoryRepository {
         return snapshot.documents.mapNotNull { it.toObject<MedicationRecord>() }
     }
 
+    suspend fun updateMedicationRecord(userId: String, record: MedicationRecord) {
+        val docRef = db.collection("users").document(userId)
+            .collection("medication_records").document(record.id)
+        docRef.set(record).await()
+    }
+
     // ---------------- 질병 기록 ----------------
     suspend fun addDiseaseRecord(userId: String, record: DiseaseRecord) {
         val docRef = db.collection("users").document(userId)
@@ -52,5 +64,11 @@ class MedicalHistoryRepository {
         val snapshot = db.collection("users").document(userId)
             .collection("disease_records").get().await()
         return snapshot.documents.mapNotNull { it.toObject<DiseaseRecord>() }
+    }
+
+    suspend fun updateDiseaseRecord(userId: String, record: DiseaseRecord) {
+        val docRef = db.collection("users").document(userId)
+            .collection("disease_records").document(record.id)
+        docRef.set(record).await()
     }
 }

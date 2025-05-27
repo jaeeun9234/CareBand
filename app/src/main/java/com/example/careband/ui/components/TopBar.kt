@@ -24,7 +24,7 @@ fun CareBandTopBar(
     onMenuClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
             Box(
                 modifier = Modifier

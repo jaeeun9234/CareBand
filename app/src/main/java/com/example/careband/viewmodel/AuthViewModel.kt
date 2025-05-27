@@ -24,6 +24,14 @@ class AuthViewModel : ViewModel() {
     private val _userId = MutableStateFlow<String?>(null)
     val userId: StateFlow<String?> = _userId
 
+    fun setUser(id: String){
+        _userId.value = id
+    }
+
+    fun clearUser(){
+        _userId.value = null
+    }
+
     init {
         checkLoginStatus()
     }
