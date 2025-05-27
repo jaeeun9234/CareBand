@@ -15,24 +15,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.careband.R
 import com.example.careband.data.model.UserType
-import androidx.compose.material3.DrawerState
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CareBandTopBar(
     isLoggedIn: Boolean,
     userType: UserType?,
-    drawerState: DrawerState? = null,
-    scope: CoroutineScope,
     onMenuClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
     TopAppBar(
         title = {
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 56.dp), // 오른쪽 아이콘 공간 확보용
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -45,10 +42,7 @@ fun CareBandTopBar(
         },
         navigationIcon = {
             if (isLoggedIn) {
-                IconButton(onClick = {
-                    scope.launch { drawerState?.open() }
-                    onMenuClick()
-                }) {
+                IconButton(onClick = onMenuClick) {
                     Icon(
                         imageVector = Icons.Default.Menu,
                         contentDescription = "Menu Icon",

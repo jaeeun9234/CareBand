@@ -14,7 +14,6 @@ import com.example.careband.ui.components.CareBandTopBar
 import com.example.careband.ui.screens.*
 import com.example.careband.ui.theme.CareBandTheme
 import com.example.careband.viewmodel.AuthViewModel
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
@@ -24,8 +23,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             CareBandTheme {
                 val navController = rememberNavController()
-                val scope = rememberCoroutineScope()
-
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
                 val userType by authViewModel.userType.collectAsState()
                 val userName by authViewModel.userName.collectAsState()
@@ -44,10 +41,12 @@ class MainActivity : ComponentActivity() {
                             CareBandTopBar(
                                 isLoggedIn = isLoggedIn,
                                 userType = userType,
-                                drawerState = null,
-                                scope = scope,
                                 onMenuClick = {
-                                    navController.navigate(Route.NAV_MENU)
+                                    if (currentRoute == Route.NAV_MENU) {
+                                        navController.popBackStack()
+                                    } else {
+                                        navController.navigate(Route.NAV_MENU)
+                                    }
                                 },
                                 onProfileClick = {
                                     if (currentRoute == Route.PROFILE_MENU) {
@@ -75,7 +74,7 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate(Route.REGISTER)
                                     },
                                     drawerState = null,
-                                    scope = scope,
+                                    scope = rememberCoroutineScope(),
                                     authViewModel = authViewModel
                                 )
                             }
@@ -90,7 +89,7 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate(Route.LOGIN)
                                     },
                                     drawerState = null,
-                                    scope = scope,
+                                    scope = rememberCoroutineScope(),
                                     authViewModel = authViewModel
                                 )
                             }
@@ -116,7 +115,8 @@ class MainActivity : ComponentActivity() {
                                 NavigationMenuScreen(
                                     navController = navController,
                                     userName = userName,
-                                    userType = userType)
+                                    userType = userType
+                                )
                             }
                         }
                     }
