@@ -21,6 +21,7 @@ import com.example.careband.data.model.UserType
 fun CareBandTopBar(
     isLoggedIn: Boolean,
     userType: UserType?,
+    userName: String,
     onMenuClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
@@ -41,7 +42,7 @@ fun CareBandTopBar(
             }
         },
         navigationIcon = {
-            if (isLoggedIn) {
+            if (isLoggedIn && userName.isNotEmpty() && userType != null) {
                 IconButton(onClick = onMenuClick) {
                     Icon(
                         imageVector = Icons.Default.Menu,
@@ -52,7 +53,7 @@ fun CareBandTopBar(
             }
         },
         actions = {
-            if (isLoggedIn) {
+            if (isLoggedIn && userName.isNotEmpty()) {
                 IconButton(onClick = onProfileClick) {
                     Icon(
                         imageVector = Icons.Default.Person,

@@ -1,5 +1,6 @@
 package com.example.careband.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,7 +14,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.careband.data.model.UserType
 import com.example.careband.viewmodel.AuthViewModel
 import com.example.careband.viewmodel.LoginViewModel
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -24,8 +24,12 @@ fun RegisterScreen(
     scope: CoroutineScope,
     authViewModel: AuthViewModel
 ) {
-    val viewModel: LoginViewModel = viewModel()
-    val db = FirebaseFirestore.getInstance()
+    val loginViewModel: LoginViewModel = viewModel()
+
+    // 🔒 ESC/뒤로가기 키 무시
+    BackHandler(enabled = true) {
+        // 아무 작업도 하지 않음 → 뒤로가기 입력 무시
+    }
 
     var isUser by remember { mutableStateOf(true) }
 
@@ -36,9 +40,11 @@ fun RegisterScreen(
     var birth by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
     var contactInfo by remember { mutableStateOf("") }
+
     var phone by remember { mutableStateOf("") }
     var userId by remember { mutableStateOf("") }
     var relationship by remember { mutableStateOf("") }
+
     var error by remember { mutableStateOf("") }
 
     Column(
@@ -96,43 +102,33 @@ fun RegisterScreen(
             if (password != confirmPassword) {
                 error = "비밀번호가 일치하지 않습니다."
             } else {
-                val cleanedId = id.trim()
-                val cleanedPassword = password.trim()
-                val fakeEmail = "$cleanedId@careband.com"
+                val fakeEmail = "${id.trim()}@careband.com"
+                val cleanPassword = password.trim()
+                val userType = if (isUser) UserType.USER else UserType.CAREGIVER
 
-                viewModel.register(
+                loginViewModel.register(
                     email = fakeEmail,
-                    password = cleanedPassword,
-                    onSuccess = {
-                        val uid = viewModel.currentUserUid() ?: return@register
-
-                        val userMap = mutableMapOf<String, Any>(
-                            "id" to id,
-                            "name" to name,
-                            "userType" to if (isUser) "USER" else "CAREGIVER"
-                        )
-
-                        if (isUser) {
-                            userMap["birth"] = birth
-                            userMap["gender"] = gender
-                            userMap["contactInfo"] = contactInfo
-                        } else {
-                            userMap["phone"] = phone
-                            userMap["userId"] = userId
-                            userMap["relationship"] = relationship
-                        }
-
-                        db.collection("users").document(uid)
-                            .set(userMap)
-                            .addOnSuccessListener {
+                    password = cleanPassword,
+                    onSuccess = { uid ->
+                        // Firestore에 사용자 정보 저장
+                        authViewModel.saveUserToFirestore(
+                            uid = uid,
+                            name = name,
+                            type = userType,
+                            birth = if (isUser) birth else "",
+                            gender = if (isUser) gender else "",
+                            protectedUserId = if (!isUser) userId else null,
+                            onSuccess = {
+                                authViewModel.checkLoginStatus()
                                 onRegisterSuccess()
+                            },
+                            onFailure = { firestoreError ->
+                                error = firestoreError
                             }
-                            .addOnFailureListener {
-                                error = "Firestore 저장 실패: ${it.message}"
-                            }
+                        )
                     },
-                    onFailure = {
-                        error = it
+                    onFailure = { authError ->
+                        error = authError
                     }
                 )
             }

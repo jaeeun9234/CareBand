@@ -1,5 +1,6 @@
 package com.example.careband.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -9,7 +10,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.careband.navigation.Route
 import com.example.careband.viewmodel.AuthViewModel
 import com.example.careband.viewmodel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +27,11 @@ fun LoginScreen(
     var id by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
+
+    // 🔒 뒤로가기 비활성화
+    BackHandler(enabled = true) {
+        // 아무 작업도 하지 않음 = 뒤로가기 무시
+    }
 
     Column(
         modifier = Modifier
@@ -52,16 +57,15 @@ fun LoginScreen(
 
         Button(onClick = {
             val cleanedId = id.trim()
-            val fakeEmail = "$cleanedId@careband.com"
             val cleanedPassword = password.trim()
+            val fakeEmail = "$cleanedId@careband.com"
 
             viewModel.login(
                 email = fakeEmail,
                 password = cleanedPassword,
-                onSuccess = { uid ->
+                onSuccess = {
                     error = ""
-                    scope.launch { drawerState?.close() }  // ✅ Drawer 강제 닫기
-                    authViewModel.checkLoginStatus(uid)
+                    authViewModel.checkLoginStatus()  // ✅ uid 없이 호출
                     onLoginSuccess()
                 },
                 onFailure = {
@@ -72,9 +76,10 @@ fun LoginScreen(
             Text("로그인")
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         TextButton(onClick = onRegisterClick) {
             Text("회원가입")
         }
     }
 }
-
