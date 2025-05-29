@@ -116,8 +116,29 @@ class MainActivity : ComponentActivity() {
                                 HealthRecordScreen(navController)
                             }
                             composable(Route.MEDICAL_HISTORY) {
-                                MedicalHistoryScreen()
+                                MedicalHistoryScreen(navController)
                             }
+                            composable(Route.DISEASE_RECORD) {
+//                                DiseaseRecordScreen(
+//                                    userId = authViewModel.userId.collectAsState().value ?: ""
+//                                )
+                                Text("질병 이력 화면")
+                            }
+
+                            composable(Route.MEDICATION_RECORD) {
+//                                MedicationRecordScreen(
+//                                    userId = authViewModel.userId.collectAsState().value ?: ""
+//                                )
+                                Text("복약 이력 화면")
+                            }
+
+                            composable(Route.VACCINATION_RECORD) {
+//                                VaccinationRecordScreen(
+//                                    userId = authViewModel.userId.collectAsState().value ?: ""
+//                                )
+                                Text("접종 이력 화면")
+                            }
+
                             composable(Route.MEDICAL_REPORT) {
                                 Text("의료 리포트 화면")
                             }
