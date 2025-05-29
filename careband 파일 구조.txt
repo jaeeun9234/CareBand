@@ -4,21 +4,21 @@ com.example.careband/
 ├── SplashActivity.kt : Splash 화면(앱 초기 로딩)
 │
 ├── data/
-│   └── model/
+│   └── model/ : 앱에서 사용하는 모든 데이터 구조 정의
 │       ├── User.kt : 사용자 계정 정보(ID, 이름, 생년월일 등)
 │       └── UserType.kt : 계정 역할 관리
-│       └── HealthRecord.kt : 건강 기록 (날짜, 체중, 혈압, 혈당) 데이터 모델
-│       └── Note.kt : 건강 기록 (노트) 데이터 모델
+│       └── HealthRecord.kt : 건강 기록 데이터 모델(날짜, 체중, 혈압, 혈당)
+│       └── Note.kt : 건강 기록에 첨부되는 노트 데이터 모델
 │       └── DiseaseRecord.kt : 질병 기록 모델
 │       └── MedicationRecord.kt : 복약 기록 모델
 │       └── VaccinationRecord.kt : 접종 기록 모델
-│   └── repository/
+│   └── repository/ : Firebase와 연결되어 데이터를 저장 및 불러오는 로직 구현
 │       └── UserManager.kt : FireBase 로그인 / 세션 정보 관리 
 │       └── HealthRepository.kt : 건강 기록 관련 Firebase 연동 로직(insert, update, get) 
 │       └── MedicalHistoryRepository.kt : 의료 이력 관련 Firebase 연동 로직(insert, update, get)
 │
 ├── ui/
-│   ├── screens/
+│   ├── screens/ : 앱의 주요 화면 UI 정의(Composable 함수 기반)
 │   │   ├── LoginScreen.kt : 로그인 창
 │   │   ├── RegisterScreen.kt : 회원가입 창
 │   │   ├── HomeScreen.kt : 홈 화면 창
@@ -29,19 +29,18 @@ com.example.careband/
 │   │   ├── NavigationMenuScreen.kt : 사이드바 메뉴 창
 │   │   ├── MedicalHistoryScreen.kt : 의료 이력 창
 │   │
-│   ├── components/ 
+│   ├── components/ : 공통 UI 요소
 │   │   ├── TopBar.kt : 상단바 구성
 │   │   ├── DrawerContent.kt : 사이드바 구성
 │   │ 
-│   └── theme/
+│   └── theme/ : 앱 (전반적인) 스타일 설정
 │       ├── Theme.kt : 앱 전체 테마 설정(Material3)
 │       ├── Color.kt : 앱 색상 정의 파일
 │       └── Typography.kt : 텍스트 스타일 정의 파일
 │
-├── viewmodel/
+├── viewmodel/ : Repository를 이용해 데이터 처리 및 화면 상태 관리(UI 중심)
 │   ├── LoginViewModel.kt : 로그인 / 회원가입 화면 상태 관리 및 Firebase 연동
 │   └── AuthViewModel.kt : 로그인 상태 및 사용자 정보 유지 (앱 전역)
 │   └── HealthViewModel.kt : 건강 기록용 + Firebase 연동
 │   └── MedicalHistoryViewModel.kt : 의료 이력 통합 관리 + Firebase 연동
 │   └── MedicalHistoryViewModelFactory.kt : userId를 전달받아 MedicalHistoryViewModel(userId)를 생성해 넘겨주는 클래스
-
