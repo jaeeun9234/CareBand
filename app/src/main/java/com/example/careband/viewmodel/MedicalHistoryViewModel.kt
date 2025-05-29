@@ -22,6 +22,12 @@ class MedicalHistoryViewModel(private val userId: String) : ViewModel() {
     private val _diseaseRecords = MutableStateFlow<List<DiseaseRecord>>(emptyList())
     val diseaseRecords: StateFlow<List<DiseaseRecord>> = _diseaseRecords
 
+    // ✅ Firestore에서 자동으로 불러오도록 설정
+    init {
+        println("🟢 MedicalHistoryViewModel 초기화됨 - userId: $userId")
+        loadAllRecords()
+    }
+
     // ---------------- Load ----------------
     fun loadAllRecords() {
         viewModelScope.launch {

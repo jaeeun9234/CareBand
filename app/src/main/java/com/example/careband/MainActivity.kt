@@ -119,10 +119,9 @@ class MainActivity : ComponentActivity() {
                                 MedicalHistoryScreen(navController)
                             }
                             composable(Route.DISEASE_RECORD) {
-//                                DiseaseRecordScreen(
-//                                    userId = authViewModel.userId.collectAsState().value ?: ""
-//                                )
-                                Text("질병 이력 화면")
+                                DiseaseRecordScreen(
+                                    userId = authViewModel.userId.collectAsState().value ?: ""
+                                )
                             }
 
                             composable(Route.MEDICATION_RECORD) {

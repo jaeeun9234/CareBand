@@ -56,19 +56,40 @@ class MedicalHistoryRepository {
         val docRef = db.collection("users").document(userId)
             .collection("disease_records").document()
 
-        val newRecord = record.copy(id = docRef.id)
-        docRef.set(newRecord).await()
+        val newRecord = record.copy(id = docRef.id, userId = userId)
+
+        try {
+            docRef.set(newRecord).await()
+            println("✅ 질병 기록 저장 완료: ${newRecord.diseaseName}")
+        } catch (e: Exception) {
+            println("❌ Firestore 저장 실패: ${e.message}")
+        }
     }
 
+
     suspend fun getDiseaseRecords(userId: String): List<DiseaseRecord> {
-        val snapshot = db.collection("users").document(userId)
-            .collection("disease_records").get().await()
-        return snapshot.documents.mapNotNull { it.toObject<DiseaseRecord>() }
+        return try {
+            val snapshot = db.collection("users").document(userId)
+                .collection("disease_records").get().await()
+
+            println("📥 불러온 질병 기록 개수: ${snapshot.size()}")
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(DiseaseRecord::class.java)?.copy(
+                    id = doc.id,
+                    userId = userId
+                )
+            }
+        } catch (e: Exception) {
+            println("❌ Firestore 불러오기 실패: ${e.message}")
+            emptyList()
+        }
     }
+
 
     suspend fun updateDiseaseRecord(userId: String, record: DiseaseRecord) {
         val docRef = db.collection("users").document(userId)
             .collection("disease_records").document(record.id)
-        docRef.set(record).await()
+
+        docRef.set(record.copy(userId = userId)).await()
     }
 }
