@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.careband.data.model.User
 import com.example.careband.data.model.UserType
+import com.example.careband.data.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class AuthViewModel : ViewModel() {
 
     private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
+    private val repository = UserRepository()
 
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
@@ -46,25 +46,14 @@ class AuthViewModel : ViewModel() {
     }
 
     fun loadUserData(uid: String) {
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val user = User(
-                        id = uid,
-                        name = document.getString("name") ?: "",
-                        type = UserType.fromString(document.getString("userType")) ?: UserType.USER,
-                        birth = document.getString("birth") ?: "",
-                        gender = document.getString("gender") ?: "",
-                        protectedUserId = document.getString("protectedUserId")
-                    )
-                    _user.value = user
-                    _userName.value = user.name
-                    _userType.value = user.type
-                }
+        viewModelScope.launch {
+            val result = repository.getUser(uid)
+            result?.let { user ->
+                _user.value = user
+                _userName.value = user.name
+                _userType.value = user.type
             }
-            .addOnFailureListener {
-                println("❌ 사용자 정보 불러오기 실패: ${it.message}")
-            }
+        }
     }
 
     fun saveUserToFirestore(
@@ -77,17 +66,23 @@ class AuthViewModel : ViewModel() {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit
     ) {
-        val user = hashMapOf(
-            "name" to name,
-            "userType" to type.name,
-            "birth" to birth,
-            "gender" to gender,
-            "protectedUserId" to protectedUserId
+        val user = User(
+            id = uid,
+            name = name,
+            type = type,
+            birth = birth,
+            gender = gender,
+            protectedUserId = protectedUserId
         )
 
-        db.collection("users").document(uid).set(user)
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { onFailure(it.message ?: "Firestore 저장 실패") }
+        viewModelScope.launch {
+            val result = repository.saveUser(uid, user)
+            if (result.isSuccess) {
+                onSuccess()
+            } else {
+                onFailure(result.exceptionOrNull()?.message ?: "알 수 없는 오류")
+            }
+        }
     }
 
     fun logout() {
