@@ -16,6 +16,7 @@ com.example.careband/
 │       └── UserManager.kt : FireBase 로그인 / 세션 정보 관리 
 │       └── HealthRepository.kt : 건강 기록 관련 Firebase 연동 로직(insert, update, get) 
 │       └── MedicalHistoryRepository.kt : 의료 이력 관련 Firebase 연동 로직(insert, update, get)
+│       └── UserRepository.kt : 사용자 정보 관련 Firebase 연동 로직(get, insert)
 │
 ├── ui/
 │   ├── screens/ : 앱의 주요 화면 UI 정의(Composable 함수 기반)
