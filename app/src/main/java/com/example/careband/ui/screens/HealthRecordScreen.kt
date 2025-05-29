@@ -37,6 +37,11 @@ fun HealthRecordScreen(
     var showNoteDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val weightText by viewModel.weightText.collectAsState()
+    val systolicText by viewModel.systolicText.collectAsState()
+    val diastolicText by viewModel.diastolicText.collectAsState()
+    val glucoseFastingText by viewModel.glucoseFastingText.collectAsState()
+    val glucosePostText by viewModel.glucosePostText.collectAsState()
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -66,45 +71,50 @@ fun HealthRecordScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = record.weight.toString(),
-            onValueChange = { viewModel.updateWeight(it.toIntOrNull() ?: 0) },
+            value =  weightText,
+            onValueChange = { viewModel.updateWeightText(it) },
             label = { Text("체중 (Kg)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            placeholder = { Text("예: 60") }
         )
 
         Row(modifier = Modifier.fillMaxWidth()) {
             OutlinedTextField(
                 modifier = Modifier.weight(1f),
-                value = record.systolic.toString(),
-                onValueChange = { viewModel.updateSystolic(it.toIntOrNull() ?: 0) },
+                value =  systolicText,
+                onValueChange = { viewModel.updateSystolicText(it) },
                 label = { Text("수축기") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                placeholder = { Text("예: 120") }
             )
             Spacer(modifier = Modifier.width(8.dp))
             OutlinedTextField(
                 modifier = Modifier.weight(1f),
-                value = record.diastolic.toString(),
-                onValueChange = { viewModel.updateDiastolic(it.toIntOrNull() ?: 0) },
+                value =  diastolicText,
+                onValueChange =  { viewModel.updateDiastolicText(it) },
                 label = { Text("이완기") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                placeholder = { Text("예: 80") }
             )
         }
 
         Row(modifier = Modifier.fillMaxWidth()) {
             OutlinedTextField(
                 modifier = Modifier.weight(1f),
-                value = record.glucoseFasting.toString(),
-                onValueChange = { viewModel.updateGlucoseFasting(it.toIntOrNull() ?: 0) },
+                value =  glucoseFastingText,
+                onValueChange = { viewModel.updateGlucoseFastingText(it) },
                 label = { Text("공복 혈당") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                placeholder = { Text("예: 80") }
             )
             Spacer(modifier = Modifier.width(8.dp))
             OutlinedTextField(
                 modifier = Modifier.weight(1f),
-                value = record.glucosePost.toString(),
-                onValueChange = { viewModel.updateGlucosePost(it.toIntOrNull() ?: 0) },
+                value =  glucosePostText,
+                onValueChange = { viewModel.updateGlucosePostText(it) },
                 label = { Text("식후 혈당") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                placeholder = { Text("예: 120") }
             )
         }
 
