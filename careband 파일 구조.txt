@@ -28,7 +28,10 @@ com.example.careband/
 │   │   ├── HealthRecordScreen.kt : 건강 기록 창 
 │   │   ├── NoteDialogScreen.kt : 건강 기록 추가 창 
 │   │   ├── NavigationMenuScreen.kt : 사이드바 메뉴 창
-│   │   ├── MedicalHistoryScreen.kt : 의료 이력 창
+│   │   ├── MedicalHistoryScreen.kt : 의료 이력 창(복약, 접종, 질병 이력 분기)
+│   │   ├── DiseaseRecordScreen.kt : 질병 이력 창
+│   │   ├── MedicationRecordScreen.kt : 복약 이력 창
+│   │   ├── VaccinationRecordScreen.kt : 접종 이력 창
 │   │
 │   ├── components/ : 공통 UI 요소
 │   │   ├── TopBar.kt : 상단바 구성
