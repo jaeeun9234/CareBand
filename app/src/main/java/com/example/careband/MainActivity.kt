@@ -125,17 +125,15 @@ class MainActivity : ComponentActivity() {
                             }
 
                             composable(Route.MEDICATION_RECORD) {
-//                                MedicationRecordScreen(
-//                                    userId = authViewModel.userId.collectAsState().value ?: ""
-//                                )
-                                Text("복약 이력 화면")
+                                MedicationRecordScreen(
+                                    userId = authViewModel.userId.collectAsState().value ?: ""
+                                )
                             }
 
                             composable(Route.VACCINATION_RECORD) {
-//                                VaccinationRecordScreen(
-//                                    userId = authViewModel.userId.collectAsState().value ?: ""
-//                                )
-                                Text("접종 이력 화면")
+                                VaccinationRecordScreen(
+                                    userId = authViewModel.userId.collectAsState().value ?: ""
+                                )
                             }
 
                             composable(Route.MEDICAL_REPORT) {

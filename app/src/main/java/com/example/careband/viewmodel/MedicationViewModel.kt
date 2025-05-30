@@ -16,7 +16,6 @@ class MedicationViewModel(private val userId: String) : ViewModel() {
     val medicationRecords: StateFlow<List<MedicationRecord>> = _medicationRecords
 
     init {
-        println("🟢 MedicationViewModel 초기화됨 - userId: $userId")
         loadMedicationRecords()
     }
 
@@ -36,6 +35,13 @@ class MedicationViewModel(private val userId: String) : ViewModel() {
     fun updateMedicationRecord(record: MedicationRecord) {
         viewModelScope.launch {
             repository.updateMedicationRecord(userId, record)
+            loadMedicationRecords()
+        }
+    }
+
+    fun deleteMedicationRecord(recordId: String) {
+        viewModelScope.launch {
+            repository.deleteMedicationRecord(userId, recordId)
             loadMedicationRecords()
         }
     }

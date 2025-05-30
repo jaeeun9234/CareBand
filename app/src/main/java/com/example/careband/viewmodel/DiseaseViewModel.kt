@@ -28,7 +28,8 @@ class DiseaseViewModel(private val userId: String) : ViewModel() {
 
     fun addDiseaseRecord(record: DiseaseRecord) {
         viewModelScope.launch {
-            repository.addDiseaseRecord(userId, record)
+            val recordWithUserId = record.copy(userId = userId)
+            repository.addDiseaseRecord(userId, recordWithUserId)
             loadDiseaseRecords()
         }
     }
@@ -36,6 +37,13 @@ class DiseaseViewModel(private val userId: String) : ViewModel() {
     fun updateDiseaseRecord(record: DiseaseRecord) {
         viewModelScope.launch {
             repository.updateDiseaseRecord(userId, record)
+            loadDiseaseRecords() // UI 갱신
+        }
+    }
+
+    fun deleteDiseaseRecord(record: DiseaseRecord) {
+        viewModelScope.launch {
+            repository.deleteDiseaseRecord(userId, record.id)
             loadDiseaseRecords()
         }
     }

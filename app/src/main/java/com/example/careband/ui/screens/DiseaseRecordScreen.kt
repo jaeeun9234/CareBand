@@ -19,6 +19,8 @@ import com.example.careband.data.model.DiseaseRecord
 import com.example.careband.viewmodel.DiseaseViewModel
 import com.example.careband.viewmodel.DiseaseViewModelFactory
 import java.util.*
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 
 @Composable
 fun DiseaseRecordScreen(
@@ -41,6 +43,7 @@ fun DiseaseRecordScreen(
     }
 
     // 입력 상태
+    var editingRecord: DiseaseRecord? by remember { mutableStateOf(null) } // 현재 수정 중인 레코드
     var diseaseName by remember { mutableStateOf("") }
     var startDate by remember { mutableStateOf("") }
     var endDate by remember { mutableStateOf("") }
@@ -54,7 +57,10 @@ fun DiseaseRecordScreen(
         .fillMaxSize()
         .padding(16.dp)) {
 
-        Text("질병 이력", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = if (editingRecord == null) "새 질병 기록 입력" else "질병 기록 수정 중",
+            style = MaterialTheme.typography.titleMedium
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         // 진단일
@@ -129,7 +135,10 @@ fun DiseaseRecordScreen(
         Button(
             onClick = {
                 if (startDate.isNotBlank() && diseaseName.isNotBlank()) {
-                    val newRecord = DiseaseRecord(
+                    val recordId = editingRecord?.id ?: "diseaseRecord:$userId:$diseaseName:$startDate"
+
+                    val updatedRecord = DiseaseRecord(
+                        id = recordId,
                         diagnosedDate = startDate,
                         endDate = endDate.takeIf { it.isNotBlank() },
                         diseaseName = diseaseName,
@@ -138,16 +147,21 @@ fun DiseaseRecordScreen(
                         memo = memo,
                         userId = userId
                     )
-                    viewModel.addDiseaseRecord(newRecord)
+
+                    if (editingRecord == null) {
+                        viewModel.addDiseaseRecord(updatedRecord)
+                    } else {
+                        viewModel.updateDiseaseRecord(updatedRecord)
+                        editingRecord = null // 수정 완료 후 초기화
+                    }
+
+                    // 폼 초기화
                     diseaseName = ""; startDate = ""; endDate = ""
                     treatment = ""; doctor = ""; memo = ""
                 }
-            },
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 8.dp)
+            }
         ) {
-            Text("추가")
+            Text(if (editingRecord == null) "추가" else "수정 완료")
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -164,7 +178,37 @@ fun DiseaseRecordScreen(
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("${index + 1}. ${record.diseaseName}", style = MaterialTheme.typography.titleMedium)
+
+                        // ✅ 첫 줄에 질병명과 수정 버튼을 나란히 표시
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "${index + 1}. ${record.diseaseName}",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            // ✏️ 수정 버튼
+                            IconButton(onClick = {
+                                editingRecord = record
+                                diseaseName = record.diseaseName
+                                startDate = record.diagnosedDate
+                                endDate = record.endDate ?: ""
+                                treatment = record.treatment
+                                doctor = record.doctor
+                                memo = record.memo
+                            }) {
+                                Icon(Icons.Default.Edit, contentDescription = "수정")
+                            }
+
+                            // 🗑 삭제 버튼
+                            IconButton(onClick = {
+                                viewModel.deleteDiseaseRecord(record)
+                            }) {
+                                Icon(Icons.Default.Delete, contentDescription = "삭제")
+                            }
+                        }
+
+                        // 날짜
                         Text(
                             text = if (record.endDate != null)
                                 "${record.diagnosedDate} ~ ${record.endDate}"
@@ -172,6 +216,7 @@ fun DiseaseRecordScreen(
                                 "${record.diagnosedDate} ~",
                             style = MaterialTheme.typography.bodySmall
                         )
+
                         Spacer(modifier = Modifier.height(6.dp))
                         Text("치료 내용", style = MaterialTheme.typography.labelSmall)
                         Text(record.treatment.ifBlank { "없음" })
