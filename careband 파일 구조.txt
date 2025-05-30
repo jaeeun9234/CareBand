@@ -39,6 +39,7 @@ com.example.careband/
 │   │   ├── RegisterScreen.kt : 회원가입 창
 │   │   ├── StartScreen.kt : 로그인/회원가입 선택 창
 │   │   ├── VaccinationRecordScreen.kt : 접종 이력 창
+│   │   └── VitalSignsChartScreen.kt : 생체 데이터 시각화 창
 │   │
 │   ├── components/ : 공통 UI 요소
 │   │   ├── TopBar.kt : 상단바 구성
@@ -60,3 +61,5 @@ com.example.careband/
 │   └── MedicationViewModelFactory.kt : 로그인한 사용자 ID를 기준으로 MedicationViewModel 생성
 │   └── VaccinationViewModel.kt : 접종 이력 화면 상태 관리 및 Firebase 연동
 │   └── VaccinationViewModelFactory.kt : 로그인한 사용자 ID를 기준으로 VaccinationViewModel 생성
+│   ├── VitalSignsViewModel.kt : 바이탈 차트용 ViewModel
+│   └── VitalSignsViewModelFactory.kt : userId 전달용 Factory
