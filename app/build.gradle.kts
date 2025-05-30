@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.careband"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -68,5 +68,5 @@ dependencies {
     // Vico chart core & compose support
     implementation("com.patrykandpatrick.vico:core:1.13.0")
     implementation("com.patrykandpatrick.vico:compose:1.13.0")
-    implementation("com.patrykandpatrick.vico:compose-m3:1.13.0") // Material3 쓰는 경우
+    implementation("com.patrykandpatrick.vico:compose-m3:1.13.0") // Material3 사용 시
 }

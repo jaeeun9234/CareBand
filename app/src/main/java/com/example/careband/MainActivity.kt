@@ -15,6 +15,8 @@ import com.example.careband.ui.components.CareBandTopBar
 import com.example.careband.ui.screens.*
 import com.example.careband.ui.theme.CareBandTheme
 import com.example.careband.viewmodel.AuthViewModel
+import com.example.careband.ui.screens.VitalSignsChartScreen
+
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
@@ -139,6 +141,11 @@ class MainActivity : ComponentActivity() {
                             composable(Route.MEDICAL_REPORT) {
                                 Text("의료 리포트 화면")
                             }
+                            composable(Route.VITALSIGNS_VIEW){
+                                VitalSignsChartScreen(
+                                    userId = authViewModel.userId.collectAsState().value ?: ""
+                                )
+                            }
                             composable(Route.ALERT_LOG) {
                                 Text("알림 기록 화면")
                             }
@@ -156,6 +163,7 @@ class MainActivity : ComponentActivity() {
                                             "건강 기록" -> navController.navigate(Route.HEALTH_RECORD)
                                             "의료 이력" -> navController.navigate(Route.MEDICAL_HISTORY)
                                             "의료 리포트" -> navController.navigate(Route.MEDICAL_REPORT)
+                                            "데이터 시각화" -> navController.navigate(Route.VITALSIGNS_VIEW)
                                             "알림 기록" -> navController.navigate(Route.ALERT_LOG)
                                             "사용자 관리" -> navController.navigate(Route.USER_MANAGEMENT)
                                             "설정" -> { /* TODO */ }
