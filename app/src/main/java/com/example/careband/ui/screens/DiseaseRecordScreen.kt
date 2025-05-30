@@ -16,8 +16,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.careband.data.model.DiseaseRecord
-import com.example.careband.viewmodel.MedicalHistoryViewModel
-import com.example.careband.viewmodel.MedicalHistoryViewModelFactory
+import com.example.careband.viewmodel.DiseaseViewModel
+import com.example.careband.viewmodel.DiseaseViewModelFactory
 import java.util.*
 
 @Composable
@@ -33,7 +33,7 @@ fun DiseaseRecordScreen(
     }
 
     // ✅ userId가 준비된 경우에만 ViewModel 생성
-    val viewModel: MedicalHistoryViewModel = viewModel(factory = MedicalHistoryViewModelFactory(userId))
+    val viewModel: DiseaseViewModel = viewModel(factory = DiseaseViewModelFactory(userId))
     val records by viewModel.diseaseRecords.collectAsState()
 
     LaunchedEffect(Unit) {

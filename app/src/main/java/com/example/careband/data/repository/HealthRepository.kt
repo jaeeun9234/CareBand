@@ -14,17 +14,19 @@ class HealthRepository {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit
     ) {
-        db.collection("healthRecords")        // 1단계: 컬렉션 이름
-            .document(userId)                // 2단계: 사용자별로 문서
-            .collection("records")           // 3단계: 날짜별 기록 서브 컬렉션
-            .document(record.date)           // 4단계: 날짜를 문서 ID로
-            .set(record)                     // 5단계: 전체 HealthRecord 저장
-            .addOnSuccessListener {
-                onSuccess()
-            }
-            .addOnFailureListener { e ->
-                onFailure(e.message ?: "알 수 없는 오류")
-            }
+        val finalRecord = record.copy(
+            id = "healthRecord:$userId:${record.date}",
+            userId = userId
+        )
+
+        FirebaseFirestore.getInstance()
+            .collection("healthRecords")
+            .document(userId)
+            .collection("records")
+            .document(record.date)
+            .set(finalRecord)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e.message ?: "저장 실패") }
     }
 
     fun getHealthRecord(

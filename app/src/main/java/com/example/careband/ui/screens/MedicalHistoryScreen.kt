@@ -14,8 +14,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.careband.viewmodel.AuthViewModel
-import com.example.careband.viewmodel.MedicalHistoryViewModel
-import com.example.careband.viewmodel.MedicalHistoryViewModelFactory
 import com.example.careband.data.model.*
 import com.example.careband.navigation.Route
 

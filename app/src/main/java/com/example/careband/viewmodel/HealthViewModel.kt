@@ -107,7 +107,11 @@ class HealthViewModel : ViewModel() {
         viewModelScope.launch {
             repository.getHealthRecord(userId, date) { record ->
                 val newRecord = record ?: HealthRecord(date = date)
-                _healthRecord.value = newRecord
+                _healthRecord.value = record ?: HealthRecord(
+                    id = "healthRecord:$userId:$date",
+                    userId = userId,
+                    date = date
+                )
 
                 // ✅ 각 필드별 텍스트 상태 설정
                 _weightText.value = if (newRecord.weight == 0) "" else newRecord.weight.toString()
