@@ -59,6 +59,7 @@ com.example.careband/
 │   ├── LoginViewModel.kt : 로그인 / 회원가입 화면 상태 관리 및 Firebase 연동
 │   └── MedicationViewModel.kt : 복약 이력 화면 상태 관리 및 Firebase 연동
 │   └── MedicationViewModelFactory.kt : 로그인한 사용자 ID를 기준으로 MedicationViewModel 생성
+│   └── MedicationCheckViewModel.kt : 복약 체크 기능 관리
 │   └── VaccinationViewModel.kt : 접종 이력 화면 상태 관리 및 Firebase 연동
 │   └── VaccinationViewModelFactory.kt : 로그인한 사용자 ID를 기준으로 VaccinationViewModel 생성
 │   ├── VitalSignsViewModel.kt : 바이탈 차트용 ViewModel
