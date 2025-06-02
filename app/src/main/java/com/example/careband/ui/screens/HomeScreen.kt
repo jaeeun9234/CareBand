@@ -24,6 +24,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.careband.R
+import com.example.careband.data.model.UserType
 import com.example.careband.navigation.Route
 import com.example.careband.viewmodel.AuthViewModel
 import java.text.SimpleDateFormat
@@ -34,6 +35,8 @@ fun HomeScreen(navController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val authViewModel: AuthViewModel = viewModel()
+
+    val userType by authViewModel.userType.collectAsState()
 
     // 로그인 상태 유지 확인 (화면 다시 올 때마다 체크)
     DisposableEffect(lifecycleOwner) {
@@ -116,20 +119,46 @@ fun HomeScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            HomeButton("의료 리포트", onClick = { navController.navigate(Route.MEDICAL_REPORT) }, modifier = Modifier.weight(1f))
-            HomeButton("알림 기록", onClick = { navController.navigate(Route.ALERT_LOG) }, modifier = Modifier.weight(1f))
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.SpaceEvenly
+//        ) {
+//            HomeButton("의료 리포트", onClick = { navController.navigate(Route.MEDICAL_REPORT) }, modifier = Modifier.weight(1f))
+//            HomeButton("알림 기록", onClick = { navController.navigate(Route.ALERT_LOG) }, modifier = Modifier.weight(1f))
+//        }
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.SpaceEvenly
+//        ) {
+//            HomeButton("건강 기록", onClick = { navController.navigate(Route.HEALTH_RECORD) }, modifier = Modifier.weight(1f))
+//            HomeButton("의료 이력", onClick = { navController.navigate(Route.MEDICAL_HISTORY) }, modifier = Modifier.weight(1f))
+//        }
+
+        userType?.let { type ->
+            when (type) {
+                UserType.USER -> {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        HomeButton("의료 리포트", onClick = { navController.navigate(Route.MEDICAL_REPORT) }, modifier = Modifier.weight(1f))
+                        HomeButton("알림 기록", onClick = { navController.navigate(Route.ALERT_LOG) }, modifier = Modifier.weight(1f))
+                    }
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        HomeButton("건강 기록", onClick = { navController.navigate(Route.HEALTH_RECORD) }, modifier = Modifier.weight(1f))
+                        HomeButton("의료 이력", onClick = { navController.navigate(Route.MEDICAL_HISTORY) }, modifier = Modifier.weight(1f))
+                    }
+                }
+                UserType.CAREGIVER -> {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        HomeButton("의료 리포트", onClick = { navController.navigate(Route.MEDICAL_REPORT) }, modifier = Modifier.weight(1f))
+                        HomeButton("알림 기록", onClick = { navController.navigate(Route.ALERT_LOG) }, modifier = Modifier.weight(1f))
+                    }
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        HomeButton("사용자 관리", onClick = { navController.navigate(Route.USER_MANAGEMENT) }, modifier = Modifier.weight(1f))
+                        HomeButton("의료 이력", onClick = { navController.navigate(Route.MEDICAL_HISTORY) }, modifier = Modifier.weight(1f))
+                    }
+                }
+            }
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            HomeButton("건강 기록", onClick = { navController.navigate(Route.HEALTH_RECORD) }, modifier = Modifier.weight(1f))
-            HomeButton("의료 이력", onClick = { navController.navigate(Route.MEDICAL_HISTORY) }, modifier = Modifier.weight(1f))
-        }
+
     }
 }
 
