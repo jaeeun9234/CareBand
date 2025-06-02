@@ -7,7 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.patrykandpatrick.vico.core.entry.entryModelOf
+import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import java.time.LocalDate
 import com.example.careband.viewmodel.VitalSignsViewModel
 import com.example.careband.viewmodel.VitalSignsViewModelFactory
@@ -20,6 +20,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
+import com.patrykandpatrick.vico.core.axis.Axis
+import com.patrykandpatrick.vico.core.axis.AxisPosition
+import com.patrykandpatrick.vico.core.entry.entryModelOf
+import com.patrykandpatrick.vico.core.formatter.ValueFormatter
 
 @Composable
 fun VitalSignsChartScreen(
@@ -109,11 +113,21 @@ fun VitalLineChart(values: List<Int>, labels: List<String>) {
 
     val entries = entryModelOf(*values.mapIndexed { i, v -> i to v }.toTypedArray())
 
+    val formattedLabels = labels.map {
+        if (it.length >= 10) it.substring(5).replace("-", "/") else it
+    }
+
+    val labelMap = formattedLabels.mapIndexed { i, label -> i.toFloat() to label }.toMap()
+
+    val customFormatter = AxisValueFormatter<AxisPosition.Horizontal.Bottom> { value, _ ->
+        labelMap[value] ?: ""
+    }
+
     Chart(
         chart = lineChart(),
         model = entries,
         startAxis = rememberStartAxis(),
-        bottomAxis = rememberBottomAxis(),
+        bottomAxis = rememberBottomAxis(valueFormatter = customFormatter),
         modifier = Modifier
             .fillMaxWidth()
             .height(180.dp)
