@@ -8,5 +8,7 @@ data class MedicationRecord(
     val startDate: String = "",
     val endDate: String = "",
     val memo: String = "",
-    val userId: String = ""
+    val userId: String = "",
+    val time: String= "", // 복용 시간대
+    val takenDates: List<String> = emptyList() // 복용 완료 날짜 목록
 )

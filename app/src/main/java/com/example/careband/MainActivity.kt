@@ -16,6 +16,7 @@ import com.example.careband.ui.screens.*
 import com.example.careband.ui.theme.CareBandTheme
 import com.example.careband.viewmodel.AuthViewModel
 import com.example.careband.ui.screens.VitalSignsChartScreen
+import com.example.careband.viewmodel.MedicationCheckViewModel
 
 
 class MainActivity : ComponentActivity() {
