@@ -1,6 +1,10 @@
 package com.example.careband
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -9,7 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.*
+import com.example.careband.ble.BleManager
 import com.example.careband.navigation.Route
 import com.example.careband.ui.components.CareBandTopBar
 import com.example.careband.ui.screens.*
@@ -17,7 +24,7 @@ import com.example.careband.ui.theme.CareBandTheme
 import com.example.careband.viewmodel.AuthViewModel
 import com.example.careband.ui.screens.VitalSignsChartScreen
 import com.example.careband.viewmodel.MedicationCheckViewModel
-
+import com.example.careband.viewmodel.SensorDataViewModel
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
@@ -35,19 +42,14 @@ class MainActivity : ComponentActivity() {
 
                 var startDestination by remember { mutableStateOf<String?>(null) }
 
-                // 로그인 상태에 따라 시작 화면 설정
                 LaunchedEffect(isLoggedIn) {
                     startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
-
-                    // 로그인된 상태에서 로그인 화면이 스택에 있다면 제거
                     if (isLoggedIn) {
                         navController.popBackStack(Route.LOGIN, inclusive = true)
                     }
                 }
 
-                // 🔐 ESC (뒤로가기) 차단 - 로그인된 상태에서 로그인 화면으로 이동한 경우 방지
                 BackHandler(enabled = isLoggedIn && currentRoute == Route.LOGIN) {
-                    // 아무 동작도 하지 않음 (ESC 무시)
                 }
 
                 if (startDestination != null) {
@@ -126,19 +128,16 @@ class MainActivity : ComponentActivity() {
                                     userId = authViewModel.userId.collectAsState().value ?: ""
                                 )
                             }
-
                             composable(Route.MEDICATION_RECORD) {
                                 MedicationRecordScreen(
                                     userId = authViewModel.userId.collectAsState().value ?: ""
                                 )
                             }
-
                             composable(Route.VACCINATION_RECORD) {
                                 VaccinationRecordScreen(
                                     userId = authViewModel.userId.collectAsState().value ?: ""
                                 )
                             }
-
                             composable(Route.MEDICAL_REPORT) {
                                 Text("의료 리포트 화면")
                             }
@@ -152,6 +151,24 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(Route.USER_MANAGEMENT) {
                                 Text("사용자 관리 화면")
+                            }
+                            composable(Route.DEVICE_CONNECTION) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                    val context = LocalContext.current
+                                    val hasPermissions =
+                                        ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
+                                                ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+
+                                    if (hasPermissions) {
+                                        DeviceConnectionScreen(
+                                            userId = authViewModel.userId.collectAsState().value ?: ""
+                                        )
+                                    } else {
+                                        Text("BLE 권한이 필요합니다. 설정에서 권한을 허용하세요.")
+                                    }
+                                } else {
+                                    Text("BLE 연결은 Android 12(API 31)+ 이상에서만 지원됩니다.")
+                                }
                             }
                             composable(Route.NAV_MENU) {
                                 NavigationMenuScreen(
@@ -168,7 +185,7 @@ class MainActivity : ComponentActivity() {
                                             "알림 기록" -> navController.navigate(Route.ALERT_LOG)
                                             "사용자 관리" -> navController.navigate(Route.USER_MANAGEMENT)
                                             "설정" -> { /* TODO */ }
-                                            "기기 연결" -> { /* TODO */ }
+                                            "기기 연결" -> navController.navigate(Route.DEVICE_CONNECTION)
                                         }
                                     }
                                 )
@@ -176,6 +193,22 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 1001) {
+            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                Log.d("BLE", "✅ 권한 허용됨")
+            } else {
+                Log.w("BLE", "❌ 권한 거부됨")
             }
         }
     }

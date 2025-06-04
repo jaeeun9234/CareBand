@@ -15,4 +15,5 @@ object Route {
     const val USER_MANAGEMENT = "user_management"
     const val NAV_MENU = "nav_menu"
     const val VITALSIGNS_VIEW = "vital_signs_chart"
+    const val DEVICE_CONNECTION = "device_connection"
 }
