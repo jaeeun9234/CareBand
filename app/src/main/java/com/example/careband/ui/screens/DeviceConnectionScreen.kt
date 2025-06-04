@@ -4,10 +4,15 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,7 +36,7 @@ fun DeviceConnectionScreen(userId: String) {
     val bleManager = remember { BleManager(context, viewModel) }
 
     var isConnected by remember { mutableStateOf(false) }
-    var scannedDevice by remember { mutableStateOf<BluetoothDevice?>(null) }
+    val scannedDevices = remember { mutableStateListOf<BluetoothDevice>() }
 
     val hasPermissions by remember {
         derivedStateOf {
@@ -40,10 +45,11 @@ fun DeviceConnectionScreen(userId: String) {
         }
     }
 
-    // BLE 기기 스캔 콜백 등록
     DisposableEffect(Unit) {
         bleManager.onDeviceDiscovered = { device ->
-            scannedDevice = device
+            if (!scannedDevices.any { it.address == device.address }) {
+                scannedDevices.add(device)
+            }
         }
         onDispose {
             bleManager.onDeviceDiscovered = null
@@ -60,42 +66,53 @@ fun DeviceConnectionScreen(userId: String) {
         Text("BLE 장치 연결", style = MaterialTheme.typography.titleLarge)
 
         if (!hasPermissions) {
+            Text("BLE 권한이 필요합니다. 설정에서 권한을 허용하세요.")
             Button(onClick = {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && activity != null) {
-                    ActivityCompat.requestPermissions(
-                        activity,
-                        arrayOf(
-                            Manifest.permission.BLUETOOTH_SCAN,
-                            Manifest.permission.BLUETOOTH_CONNECT
-                        ),
-                        1001
-                    )
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
+                context.startActivity(intent)
             }) {
-                Text("BLE 권한 요청")
+                Text("앱 설정으로 이동")
             }
-            Text("BLE 권한이 필요합니다.")
-            return@Column
-        }
-
-        Button(onClick = {
-            bleManager.startScan()
-        }) {
-            Text("스캔 시작")
-        }
-
-        scannedDevice?.let { device ->
-            Text("발견된 기기: ${device.name ?: "알 수 없음"}")
+        } else {
             Button(onClick = {
-                bleManager.connectToDevice(device)
-                isConnected = true
+                scannedDevices.clear()
+                bleManager.startScan()
             }) {
-                Text("연결하기")
+                Text("스캔 시작")
             }
-        } ?: Text("아직 기기를 찾지 못했습니다")
 
-        if (isConnected) {
-            Text("✅ 연결됨", color = MaterialTheme.colorScheme.primary)
+            if (scannedDevices.isEmpty()) {
+                Text("아직 기기를 찾지 못했습니다")
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxHeight()) {
+                    items(scannedDevices) { device ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = device.name ?: "이름 없음",
+                                modifier = Modifier.weight(1f)
+                            )
+                            Button(onClick = {
+                                bleManager.connectToDevice(device)
+                                isConnected = true
+                            }) {
+                                Text("연결")
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (isConnected) {
+                Text("✅ 연결됨", color = MaterialTheme.colorScheme.primary)
+            }
         }
     }
 }

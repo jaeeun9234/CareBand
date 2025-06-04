@@ -33,6 +33,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CareBandTheme {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    val permissions = arrayOf(
+                        Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.BLUETOOTH_CONNECT
+                    )
+                    if (!permissions.all {
+                            ActivityCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+                        }) {
+                        ActivityCompat.requestPermissions(this, permissions, 1001)
+                    }
+                }
                 val navController = rememberNavController()
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
                 val userType by authViewModel.userType.collectAsState()
@@ -216,4 +227,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }

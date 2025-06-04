@@ -7,6 +7,7 @@ import android.bluetooth.le.*
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
@@ -21,27 +22,38 @@ class BleManager(
 ) {
     var onDeviceDiscovered: ((BluetoothDevice) -> Unit)? = null
 
-    private val bluetoothAdapter: BluetoothAdapter? = (context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
+    private val bluetoothAdapter: BluetoothAdapter? =
+        (context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
     private var bluetoothGatt: BluetoothGatt? = null
 
     companion object {
-        val UUID_FALL_DETECT = UUID.fromString("0000ABCD-0000-1000-8000-00805f9b34fb")
+        val UUID_FALL_DETECT = UUID.fromString("00002A37-0000-1000-8000-00805f9b34fb")
         val UUID_SERVICE = UUID.fromString("0000180D-0000-1000-8000-00805f9b34fb")
         const val REQUEST_CODE_PERMISSIONS = 1001
     }
+    val discoveredDevices = mutableSetOf<String>() // MAC 주소 기준 중복 방지
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT])
     fun startScan() {
+        Log.d("BLE", "startScan() 호출됨")
+
         if (!hasPermissions()) {
+            Log.w("BLE", "권한 없음 -> requestPermissions 호출")
             requestPermissions()
             return
         }
 
-        bluetoothAdapter?.bluetoothLeScanner?.let { scanner ->
-            val scanFilter = ScanFilter.Builder().build()
-            val scanSettings = ScanSettings.Builder().build()
-            scanner.startScan(listOf(scanFilter), scanSettings, scanCallback)
+        Log.d("BLE", "권한 있음 -> BLE 스캔 시작")
+
+        try {
+            bluetoothAdapter?.bluetoothLeScanner?.let { scanner ->
+                val scanSettings = ScanSettings.Builder().build()
+                scanner.startScan(null, scanSettings, scanCallback)
+                Log.d("BLE", "BLE 스캔 중...")
+            }
+        } catch (e: SecurityException) {
+            Log.e("BLE", "startScan 시 권한 오류", e)
         }
     }
 
@@ -77,66 +89,90 @@ class BleManager(
         @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT])
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val device = result.device
-            Log.d("BLE", "디바이스 발견: ${device.name}")
-            onDeviceDiscovered?.invoke(device)  // 🔥 추가: Compose에 전달
-            connectToDevice(device)
-            bluetoothAdapter?.bluetoothLeScanner?.stopScan(this)
+            val address = device.address
+
+            if (device.name != null && discoveredDevices.add(address)) {
+                Log.d("BLE", "🔍 발견된 기기: ${device.name}, $address")
+                onDeviceDiscovered?.invoke(device)
+            }
         }
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun connectToDevice(device: BluetoothDevice) {
         if (!hasPermissions()) return
-        bluetoothGatt = device.connectGatt(context, false, gattCallback)
+        try {
+            bluetoothGatt = device.connectGatt(context, false, gattCallback)
+        } catch (e: SecurityException) {
+            Log.e("BLE", "connectGatt 오류", e)
+        }
     }
 
     private val gattCallback = object : BluetoothGattCallback() {
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            if (!hasPermissions()) return
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.d("BLE", "BLE 연결 성공")
-                gatt.discoverServices()
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.d("BLE", "BLE 연결 해제됨")
+            try {
+                if (!hasPermissions()) return
+                if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    Log.d("BLE", "BLE 연결 성공")
+                    gatt.discoverServices()
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                    Log.d("BLE", "BLE 연결 해제됨")
+                }
+            } catch (e: SecurityException) {
+                Log.e("BLE", "onConnectionStateChange 오류", e)
             }
         }
 
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-            if (!hasPermissions()) return
+            try {
+                val service = gatt.getService(UUID_SERVICE)
+                val fallCharacteristic = service?.getCharacteristic(UUID_FALL_DETECT)
 
-            val service = gatt.getService(UUID_SERVICE)
-            val fallCharacteristic = service?.getCharacteristic(UUID_FALL_DETECT)
-
-            fallCharacteristic?.let {
-                gatt.setCharacteristicNotification(it, true)
-                val descriptor = it.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"))
-                descriptor?.let { d ->
-                    d.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                    gatt.writeDescriptor(d)
+                if (fallCharacteristic != null) {
+                    gatt.setCharacteristicNotification(fallCharacteristic, true)
+                    val descriptor = fallCharacteristic.getDescriptor(
+                        UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+                    )
+                    descriptor?.let {
+                        it.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        gatt.writeDescriptor(it)
+                    }
+                } else {
+                    Log.w("BLE", "❌ Characteristic 찾을 수 없음!")
                 }
+            } catch (e: SecurityException) {
+                Log.e("BLE", "onServicesDiscovered 오류", e)
             }
         }
 
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
-            if (!hasPermissions()) return
-            val uuid = characteristic.uuid
-            val value = characteristic.getStringValue(0)
-            Log.d("BLE", "수신된 데이터: $uuid -> $value")
+            try {
+                if (!hasPermissions()) return
+                val uuid = characteristic.uuid
+                val value = characteristic.getStringValue(0)
+                Log.d("BLE", "수신된 데이터: $uuid -> $value")
 
-            if (uuid == UUID_FALL_DETECT) {
-                viewModel.updateFromBle(uuid, value)
+                if (uuid == UUID_FALL_DETECT) {
+                    viewModel.updateFromBle(uuid, value)
+                }
+            } catch (e: SecurityException) {
+                Log.e("BLE", "onCharacteristicChanged 오류", e)
             }
         }
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun disconnect() {
-        if (!hasPermissions()) return
-        bluetoothGatt?.disconnect()
-        bluetoothGatt?.close()
-        bluetoothGatt = null
+        try {
+            if (!hasPermissions()) return
+            bluetoothGatt?.disconnect()
+            bluetoothGatt?.close()
+            bluetoothGatt = null
+        } catch (e: SecurityException) {
+            Log.e("BLE", "disconnect 오류", e)
+        }
     }
 }
