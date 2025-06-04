@@ -76,6 +76,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     ) { paddingValues ->
+
+                        val userIdState = authViewModel.userId.collectAsState()
+                        val userId = userIdState.value ?: ""
+
                         NavHost(
                             navController = navController,
                             startDestination = startDestination!!,
@@ -124,34 +128,33 @@ class MainActivity : ComponentActivity() {
                                 MedicalHistoryScreen(navController)
                             }
                             composable(Route.DISEASE_RECORD) {
-                                DiseaseRecordScreen(
-                                    userId = authViewModel.userId.collectAsState().value ?: ""
-                                )
+                                DiseaseRecordScreen(userId = userId)
                             }
                             composable(Route.MEDICATION_RECORD) {
-                                MedicationRecordScreen(
-                                    userId = authViewModel.userId.collectAsState().value ?: ""
-                                )
+                                MedicationRecordScreen(userId = userId)
                             }
                             composable(Route.VACCINATION_RECORD) {
-                                VaccinationRecordScreen(
-                                    userId = authViewModel.userId.collectAsState().value ?: ""
-                                )
+                                VaccinationRecordScreen(userId = userId)
                             }
                             composable(Route.MEDICAL_REPORT) {
-                                Text("의료 리포트 화면")
+                                MedicalReportScreen(navController, userId = userId)
                             }
+
                             composable(Route.VITALSIGNS_VIEW){
                                 VitalSignsChartScreen(
                                     userId = authViewModel.userId.collectAsState().value ?: ""
                                 )
                             }
+
+
                             composable(Route.ALERT_LOG) {
                                 Text("알림 기록 화면")
                             }
+
                             composable(Route.USER_MANAGEMENT) {
                                 Text("사용자 관리 화면")
                             }
+
                             composable(Route.DEVICE_CONNECTION) {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                     val context = LocalContext.current
@@ -170,6 +173,7 @@ class MainActivity : ComponentActivity() {
                                     Text("BLE 연결은 Android 12(API 31)+ 이상에서만 지원됩니다.")
                                 }
                             }
+
                             composable(Route.NAV_MENU) {
                                 NavigationMenuScreen(
                                     navController = navController,
