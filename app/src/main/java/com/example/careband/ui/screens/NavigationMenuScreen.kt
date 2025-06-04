@@ -2,6 +2,7 @@ package com.example.careband.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,45 +31,69 @@ fun NavigationMenuScreen(
             when (userType) {
                 UserType.USER -> {
                     TextButton(onClick = { onMenuClick("건강 기록") }) {
-                        Text("건강 기록", color = Color.Black)
+                        Text(
+                            text = "건강 기록",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                     TextButton(onClick = { onMenuClick("의료 이력") }) {
-                        Text("의료 이력", color = Color.Black)
+                        Text(
+                            text = "의료 이력",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                     TextButton(onClick = { onMenuClick("의료 리포트") }) {
-                        Text("의료 리포트", color = Color.Black)
+                        Text(
+                            text = "의료 리포트",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                     TextButton(onClick = { onMenuClick("데이터 시각화") }) {
-                        Text("데이터 시각화", color = Color.Black)
+                        Text(
+                            text = "데이터 시각화",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                     TextButton(onClick = { onMenuClick("알림 기록") }) {
-                        Text("알림 기록", color = Color.Black)
+                        Text(
+                            text = "알림 기록",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                     TextButton(onClick = { onMenuClick("기기 연결") }) {
-                        Text("기기 연결", color = Color.Black)
+                        Text(
+                            text = "기기 연결",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                     TextButton(onClick = { onMenuClick("설정") }) {
-                        Text("설정", color = Color.Black)
+                        Text(
+                            text = "설정",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
                 UserType.CAREGIVER -> {
                     TextButton(onClick = { onMenuClick("의료 리포트") }) {
-                        Text("의료 리포트", color = Color.Black)
+                        Text(
+                            text = "의료 리포트",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                     TextButton(onClick = { onMenuClick("알림 기록") }) {
-                        Text("알림 기록", color = Color.Black)
+                        Text(
+                            text = "알림 기록",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                     TextButton(onClick = { onMenuClick("사용자 관리") }) {
-                        Text("사용자 관리", color = Color.Black)
+                        Text(
+                            text = "사용자 관리",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                     TextButton(onClick = { onMenuClick("설정") }) {
-                        Text("설정", color = Color.Black)
+                        Text(
+                            text = "설정",
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
 
             TextButton(onClick = { navController.navigate(Route.PROFILE_MENU) }) {
-                Text("계정 전환", color = Color.Black)
+                Text(
+                    text = "계정 전환",
+                    color = MaterialTheme.colorScheme.onSurface)
             }
         }
     }

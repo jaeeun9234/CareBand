@@ -12,8 +12,13 @@ import com.example.careband.ui.theme.CareBandPink
 
 val DarkColorScheme = darkColorScheme(
     primary = Purple80,
+    onPrimary = Color.White,        // 버튼/상단바 위 텍스트
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    onSecondary = Color.White,
+    background = Color.Black,
+    surface = Color.DarkGray,
+    onBackground = Color.White,     // 배경 위 텍스트
+    onSurface = Color.White         // 카드나 표면 위 텍스트
 )
 
 val LightColorScheme = lightColorScheme(

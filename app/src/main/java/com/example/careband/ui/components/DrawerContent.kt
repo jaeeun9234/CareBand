@@ -20,7 +20,7 @@ fun DrawerContent(
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.White
+        color = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier
@@ -55,7 +55,8 @@ fun DrawerContent(
                             .fillMaxWidth()
                             .padding(vertical = 12.dp)
                             .clickable { onMenuClick(menu) },
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
