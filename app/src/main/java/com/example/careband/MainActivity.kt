@@ -60,8 +60,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                BackHandler(enabled = isLoggedIn && currentRoute == Route.LOGIN) {
-                }
+                BackHandler(enabled = isLoggedIn && currentRoute == Route.LOGIN) {}
 
                 if (startDestination != null) {
                     Scaffold(
@@ -148,24 +147,25 @@ class MainActivity : ComponentActivity() {
                                 VaccinationRecordScreen(userId = userId)
                             }
                             composable(Route.MEDICAL_REPORT) {
-                                MedicalReportScreen(navController, userId = userId)
+                                userType?.let {
+                                    MedicalReportScreen(
+                                        navController = navController,
+                                        userId = userId,
+                                        userType = it
+                                    )
+                                }
                             }
-
-                            composable(Route.VITALSIGNS_VIEW){
+                            composable(Route.VITALSIGNS_VIEW) {
                                 VitalSignsChartScreen(
                                     userId = authViewModel.userId.collectAsState().value ?: ""
                                 )
                             }
-
-
                             composable(Route.ALERT_LOG) {
                                 Text("알림 기록 화면")
                             }
-
                             composable(Route.USER_MANAGEMENT) {
                                 Text("사용자 관리 화면")
                             }
-
                             composable(Route.DEVICE_CONNECTION) {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                     val context = LocalContext.current
@@ -184,7 +184,6 @@ class MainActivity : ComponentActivity() {
                                     Text("BLE 연결은 Android 12(API 31)+ 이상에서만 지원됩니다.")
                                 }
                             }
-
                             composable(Route.NAV_MENU) {
                                 NavigationMenuScreen(
                                     navController = navController,
@@ -227,5 +226,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 }
