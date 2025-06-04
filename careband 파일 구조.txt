@@ -16,6 +16,7 @@ com.example.careband/
 │       └── Note.kt : 건강 기록에 첨부되는 노트 데이터 모델
 │       ├── User.kt : 사용자 계정 정보(ID, 이름, 생년월일 등)
 │       └── UserType.kt : 계정 역할 관리
+│       └── ReportSummary.kt
 │       └── VaccinationRecord.kt : 접종 기록 모델
 │
 │   └── repository/ : Firebase와 연결되어 데이터를 저장 및 불러오는 로직 구현
@@ -33,6 +34,7 @@ com.example.careband/
 │   │   ├── LoginScreen.kt : 로그인 창
 │   │   ├── MedicalHistoryScreen.kt : 의료 이력 창(복약, 접종, 질병 이력 분기)
 │   │   ├── MedicationRecordScreen.kt : 복약 이력 창
+│   │   ├── MedicalReportScreen.kt
 │   │   ├── NavigationMenuScreen.kt : 사이드바 메뉴 창
 │   │   ├── NoteDialogScreen.kt : 건강 기록 추가 창 
 │   │   ├── ProfileMenuScreen.kt : 계정 전환 / 로그아웃 창
@@ -57,6 +59,7 @@ com.example.careband/
 │
 │   └── HealthViewModel.kt : 건강 기록용 + Firebase 연동
 │   ├── LoginViewModel.kt : 로그인 / 회원가입 화면 상태 관리 및 Firebase 연동
+│   └── MedicalReportViewModel.kt
 │   └── MedicationViewModel.kt : 복약 이력 화면 상태 관리 및 Firebase 연동
 │   └── MedicationViewModelFactory.kt : 로그인한 사용자 ID를 기준으로 MedicationViewModel 생성
 │   └── MedicationCheckViewModel.kt : 복약 체크 기능 관리
