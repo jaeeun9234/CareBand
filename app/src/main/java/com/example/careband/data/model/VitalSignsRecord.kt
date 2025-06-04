@@ -1,6 +1,7 @@
 package com.example.careband.data.model
 
 data class VitalSignsRecord(
+    val date: String = "",
     val id: String = "",              // record_id: 고유 ID (문자열 ID로 관리)
     val userId: String = "",          // user_id: 사용자 고유 ID (FK 역할)
     val heartRate: Int = 0,           // 심박수 (BPM)
