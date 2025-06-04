@@ -20,6 +20,7 @@ com.example.careband/
 │       └── VaccinationRecord.kt : 접종 기록 모델
 │
 │   └── repository/ : Firebase와 연결되어 데이터를 저장 및 불러오는 로직 구현
+│       └── CaregiverRepository.kt
 │       └── DiseaseRepository.kt : 질병 기록 관련 Firebase 연동 로직
 │       └── HealthRepository.kt : 건강 기록 관련 Firebase 연동 로직(insert, update, get) 
 │       └── MedicationRepository.kt : 복약 기록 관련 Firebase 연동 로직
@@ -54,6 +55,8 @@ com.example.careband/
 │
 ├── viewmodel/ : Repository를 이용해 데이터 처리 및 화면 상태 관리(UI 중심)
 │   └── AuthViewModel.kt : 로그인 상태 및 사용자 정보 유지 (앱 전역)
+│   └── CaregiverViewModel.kt
+│   └── CaregiverViewModelFactory.kt
 │   └── DiseaseViewModel.kt : 질병 이력 화면 상태 관리 및 Firebase 연동
 │   └── DiseaseViewModelFactory.kt : 로그인한 사용자 ID를 기준으로 DiseaseViewModel 생성
 │
