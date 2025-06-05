@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,7 +37,9 @@ fun DeviceConnectionScreen(userId: String) {
     val bleManager = remember { BleManager(context, viewModel) }
 
     var isConnected by remember { mutableStateOf(false) }
-    val scannedDevices = remember { mutableStateListOf<BluetoothDevice>() }
+    var connectedDevice by remember { mutableStateOf<BluetoothDevice?>(null) }
+    val discoveredDevices = remember { mutableStateListOf<BluetoothDevice>() }
+    var selectedDevice by remember { mutableStateOf<BluetoothDevice?>(null) }
 
     val hasPermissions by remember {
         derivedStateOf {
@@ -45,15 +48,25 @@ fun DeviceConnectionScreen(userId: String) {
         }
     }
 
+    LaunchedEffect(Unit) {
+        bleManager.onConnected = { device ->
+            isConnected = true
+            connectedDevice = device
+        }
+        bleManager.onDisconnected = {
+            isConnected = false
+            connectedDevice = null
+            selectedDevice = null
+        }
+    }
+
     DisposableEffect(Unit) {
         bleManager.onDeviceDiscovered = { device ->
-            if (!scannedDevices.any { it.address == device.address }) {
-                scannedDevices.add(device)
+            if (device.name != null && discoveredDevices.none { it.address == device.address }) {
+                discoveredDevices.add(device)
             }
         }
-        onDispose {
-            bleManager.onDeviceDiscovered = null
-        }
+        onDispose { bleManager.onDeviceDiscovered = null }
     }
 
     Column(
@@ -77,41 +90,47 @@ fun DeviceConnectionScreen(userId: String) {
                 Text("앱 설정으로 이동")
             }
         } else {
-            Button(onClick = {
-                scannedDevices.clear()
-                bleManager.startScan()
-            }) {
-                Text("스캔 시작")
-            }
+            connectedDevice?.let { device ->
+                Text("✅ 연결된 기기: ${device.name ?: "이름 없음"}")
+                Button(onClick = { bleManager.disconnect() }) {
+                    Text("연결 해제")
+                }
+            } ?: run {
+                Button(onClick = {
+                    discoveredDevices.clear()
+                    bleManager.startScan()
+                }) {
+                    Text("스캔 시작")
+                }
 
-            if (scannedDevices.isEmpty()) {
-                Text("아직 기기를 찾지 못했습니다")
-            } else {
-                LazyColumn(modifier = Modifier.fillMaxHeight()) {
-                    items(scannedDevices) { device ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    items(discoveredDevices) { device ->
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp)
+                                .padding(vertical = 4.dp)
+                                .clickable { selectedDevice = device }
                         ) {
-                            Text(
-                                text = device.name ?: "이름 없음",
-                                modifier = Modifier.weight(1f)
-                            )
-                            Button(onClick = {
-                                bleManager.connectToDevice(device)
-                                isConnected = true
-                            }) {
-                                Text("연결")
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text("이름: ${device.name ?: "알 수 없음"}")
+                                Text("주소: ${device.address}")
                             }
                         }
                     }
                 }
-            }
 
-            if (isConnected) {
-                Text("✅ 연결됨", color = MaterialTheme.colorScheme.primary)
+                selectedDevice?.let { device ->
+                    Text("선택된 기기: ${device.name ?: "알 수 없음"}")
+                    Button(onClick = {
+                        bleManager.connectToDevice(device)
+                    }) {
+                        Text("연결하기")
+                    }
+                }
             }
         }
     }
