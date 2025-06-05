@@ -1,3 +1,4 @@
+// 테스트용 수정
 package com.example.careband
 
 import android.Manifest
